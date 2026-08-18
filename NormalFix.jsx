@@ -2,18 +2,29 @@
 #targetengine "NormalFix"
 
 /*
-NormalFix v1.2
-Audit and selected remediation for paragraphs using the paragraph style Normal
-with local/manual formatting overrides. InDesign commonly displays this state as Normal+.
+NormalFix v1.3
 
-v1.2 adds multi-select remediation for explicitly selected NF-001 findings.
-No document-wide bulk remediation is provided.
+Audits paragraphs using the paragraph style Normal for local/manual overrides.
+Paragraphs inside tables are excluded from NormalFix and are owned by TableFix.
+
+v1.3 changes:
+  - excludes Normal paragraphs inside tables from audit findings;
+  - reports the number of excluded table paragraphs;
+  - re-checks the table exclusion immediately before selected remediation;
+  - retains v1.2 multi-select selected remediation behavior.
+
+IMPORTANT:
+Selected remediation still uses applyParagraphStyle(style, true), which clears local
+text attributes. Do not use remediation on body paragraphs containing intentional
+manual or character-level formatting until the character-style-preservation update.
+
+No document-wide Fix All action is provided.
 
 ExtendScript / ECMAScript 3 compatible.
 */
 
 (function () {
-    var VERSION = "1.2";
+    var VERSION = "1.3";
     var STYLE_NAME = "Normal";
     var FINDING_CODE = "NF-001";
     var UNKNOWN_CODE = "NF-002";
@@ -38,7 +49,9 @@ ExtendScript / ECMAScript 3 compatible.
         rows = [];
         counts = {
             paragraphsScanned: 0,
-            normalParagraphs: 0,
+            normalParagraphsTotal: 0,
+            tableNormalExcluded: 0,
+            eligibleNormalParagraphs: 0,
             findings: 0,
             cleanNormal: 0,
             unknown: 0,
@@ -71,7 +84,15 @@ ExtendScript / ECMAScript 3 compatible.
                         continue;
                     }
 
-                    counts.normalParagraphs++;
+                    counts.normalParagraphsTotal++;
+
+                    if (isInsideTable(para)) {
+                        counts.tableNormalExcluded++;
+                        continue;
+                    }
+
+                    counts.eligibleNormalParagraphs++;
+
                     override = overrideState(para);
                     if (override.method === "styleOverridden fallback") {
                         counts.fallback++;
@@ -91,10 +112,11 @@ ExtendScript / ECMAScript 3 compatible.
 
             sortRows();
             refresh(doc);
+
             if (rows.length > 0) {
-                status("Scan complete. Select one or more findings to Locate or Fix Selected to Normal.");
+                status("Scan complete. Table paragraphs were excluded. Select one or more findings to Locate or Fix Selected to Normal.");
             } else {
-                status("Scan complete. No Normal+ findings were detected.");
+                status("Scan complete. No eligible Normal+ findings were detected outside tables.");
             }
         } catch (eScan) {
             status("Scan failed: " + eScan.message);
@@ -123,7 +145,7 @@ ExtendScript / ECMAScript 3 compatible.
             paragraphIndex: loc.paragraphIndex,
             location: loc.text,
             preview: previewText(safeContents(para)),
-            finding: "Normal is applied, but local/manual formatting overrides exist.",
+            finding: "Normal is applied outside a table, but local/manual formatting overrides exist.",
             action: "Fix Selected to Normal",
             paragraph: para,
             pageRef: loc.pageRef
@@ -145,7 +167,7 @@ ExtendScript / ECMAScript 3 compatible.
             paragraphIndex: loc.paragraphIndex,
             location: loc.text,
             preview: previewText(safeContents(para)),
-            finding: "Normal is applied, but NormalFix could not verify override state.",
+            finding: "Normal is applied outside a table, but NormalFix could not verify override state.",
             action: "Locate",
             paragraph: para,
             pageRef: loc.pageRef
@@ -155,20 +177,111 @@ ExtendScript / ECMAScript 3 compatible.
     function overrideState(para) {
         var value;
 
-        // Primary Adobe DOM method. false means an applied character style by itself
-        // is not counted as a paragraph-style override.
         try {
             value = para.textHasOverrides(StyleType.PARAGRAPH_STYLE_TYPE, false);
             return {value: value === true, method: "textHasOverrides"};
         } catch (ePrimary) {}
 
-        // Read-only fallback for ExtendScript DOM variations.
         try {
             value = para.styleOverridden;
             return {value: value === true, method: "styleOverridden fallback"};
         } catch (eFallback) {}
 
         return {value: null, method: "unavailable"};
+    }
+
+    function isInsideTable(para) {
+        var node;
+
+        try {
+            node = para;
+            if (ancestorIsCell(node)) {
+                return true;
+            }
+        } catch (eParaChain) {}
+
+        try {
+            if (para.insertionPoints.length > 0) {
+                node = para.insertionPoints.item(0);
+                if (ancestorIsCell(node)) {
+                    return true;
+                }
+            }
+        } catch (eIPChain) {}
+
+        try {
+            if (para.cells !== undefined && para.cells.length > 0) {
+                return true;
+            }
+        } catch (eCells) {}
+
+        return false;
+    }
+
+    function ancestorIsCell(startNode) {
+        var node = startNode;
+        var depth = 0;
+        var typeName;
+
+        while (node !== null && node !== undefined && depth < 16) {
+            typeName = objectTypeName(node);
+            if (typeName === "Cell") {
+                return true;
+            }
+
+            if (typeName === "Story" ||
+                typeName === "Document" ||
+                typeName === "Application") {
+                return false;
+            }
+
+            try {
+                node = node.parent;
+            } catch (eParent) {
+                return false;
+            }
+
+            depth++;
+        }
+
+        return false;
+    }
+
+    function objectTypeName(obj) {
+        var name = "";
+
+        if (obj === null || obj === undefined) {
+            return name;
+        }
+
+        try {
+            if (obj.constructor && obj.constructor.name) {
+                name = String(obj.constructor.name);
+                if (name.length > 0) {
+                    return name;
+                }
+            }
+        } catch (eConstructor) {}
+
+        try {
+            if (obj.constructorName !== undefined) {
+                name = String(obj.constructorName);
+                if (name.length > 0) {
+                    return name;
+                }
+            }
+        } catch (eConstructorName) {}
+
+        try {
+            if (obj.reflect && obj.reflect.name) {
+                name = String(obj.reflect.name);
+                if (name.length > 0) {
+                    return name;
+                }
+            }
+        } catch (eReflect) {}
+
+        return name;
     }
 
     function locationOf(para) {
@@ -238,7 +351,7 @@ ExtendScript / ECMAScript 3 compatible.
         } catch (eFont) {}
 
         ui.summary = ui.win.add("statictext", undefined, "", {multiline: true});
-        ui.summary.preferredSize = [900, 64];
+        ui.summary.preferredSize = [900, 82];
 
         ui.list = ui.win.add("listbox", undefined, [], {multiselect: true});
         ui.list.preferredSize = [900, 400];
@@ -268,6 +381,7 @@ ExtendScript / ECMAScript 3 compatible.
 
     function refresh(doc) {
         var i, row, line, detection;
+
         ui.list.removeAll();
 
         for (i = 0; i < rows.length; i++) {
@@ -287,7 +401,9 @@ ExtendScript / ECMAScript 3 compatible.
 
         ui.summary.text = docName(doc) + "\n" +
             "Paragraphs scanned: " + counts.paragraphsScanned +
-            "    Normal paragraphs: " + counts.normalParagraphs +
+            "    Normal total: " + counts.normalParagraphsTotal +
+            "    Normal in tables excluded: " + counts.tableNormalExcluded + "\n" +
+            "Eligible Normal outside tables: " + counts.eligibleNormalParagraphs +
             "    Normal+ findings: " + counts.findings +
             "    Clean Normal: " + counts.cleanNormal +
             (counts.unknown > 0 ? "    Override unknown: " + counts.unknown : "") + "\n" +
@@ -353,17 +469,19 @@ ExtendScript / ECMAScript 3 compatible.
             return selected;
         }
 
-        // ScriptUI returns one ListItem for a single selection and an array-like
-        // collection when multiselect contains more than one item.
         try {
             if (selection.length !== undefined && selection.index === undefined) {
                 for (i = 0; i < selection.length; i++) {
                     item = selection[i];
-                    if (item !== null && item !== undefined && item.index !== undefined && rows[item.index] !== undefined) {
+                    if (item !== null &&
+                        item !== undefined &&
+                        item.index !== undefined &&
+                        rows[item.index] !== undefined) {
                         selected.push(rows[item.index]);
                     }
                 }
-            } else if (selection.index !== undefined && rows[selection.index] !== undefined) {
+            } else if (selection.index !== undefined &&
+                       rows[selection.index] !== undefined) {
                 selected.push(rows[selection.index]);
             }
         } catch (eSelection) {}
@@ -393,23 +511,26 @@ ExtendScript / ECMAScript 3 compatible.
         }
 
         if (targets.length === 0) {
-            alert("None of the selected rows are verified NF-001 Normal+ findings.\n\nNF-002 unknown-state rows are locate-only.");
+            alert("None of the selected rows are verified NF-001 Normal+ findings outside tables.\n\nNF-002 unknown-state rows are locate-only.");
             return;
         }
 
         if (targets.length === 1) {
             message = "NormalFix will restore the selected paragraph to the Normal paragraph style and clear its local/manual formatting overrides.\n\n" +
+                      "Table paragraphs are excluded.\n\n" +
                       "This affects the entire selected paragraph.\n\n" +
                       targets[0].location + "\n\n" +
                       "Text: " + shortPreview(targets[0].preview);
         } else {
             message = "NormalFix will restore " + targets.length + " selected paragraphs to the Normal paragraph style and clear their local/manual formatting overrides.\n\n" +
-                      "Only the explicitly selected, verified NF-001 findings will be changed.";
+                      "Only explicitly selected, verified NF-001 findings outside tables will be changed.";
         }
 
         if (ineligible > 0) {
             message += "\n\nSelected but ineligible rows that will be skipped: " + ineligible;
         }
+
+        message += "\n\nCAUTION: v1.3 remediation still clears local text attributes. Do not continue if these paragraphs contain intentional manual or character-level formatting.";
 
         if (!confirm(message + "\n\nContinue?")) {
             return;
@@ -422,6 +543,7 @@ ExtendScript / ECMAScript 3 compatible.
         var fixedCount = 0;
         var skippedCount = 0;
         var failedCount = 0;
+        var tableSkippedCount = 0;
         var oldRedraw = null;
         var i, row, para, currentStyle, currentOverride, canonicalStyle, verification;
 
@@ -442,10 +564,15 @@ ExtendScript / ECMAScript 3 compatible.
                     continue;
                 }
 
+                if (isInsideTable(para)) {
+                    skippedCount++;
+                    tableSkippedCount++;
+                    continue;
+                }
+
                 currentStyle = paragraphStyleName(para);
                 currentOverride = overrideState(para);
 
-                // Guard against stale rows or paragraphs edited after the scan.
                 if (currentStyle !== STYLE_NAME || currentOverride.value !== true) {
                     skippedCount++;
                     continue;
@@ -453,7 +580,8 @@ ExtendScript / ECMAScript 3 compatible.
 
                 try {
                     canonicalStyle = para.appliedParagraphStyle;
-                    if (!valid(canonicalStyle) || String(canonicalStyle.name) !== STYLE_NAME) {
+                    if (!valid(canonicalStyle) ||
+                        String(canonicalStyle.name) !== STYLE_NAME) {
                         skippedCount++;
                         continue;
                     }
@@ -461,7 +589,8 @@ ExtendScript / ECMAScript 3 compatible.
                     para.applyParagraphStyle(canonicalStyle, true);
                     verification = overrideState(para);
 
-                    if (paragraphStyleName(para) === STYLE_NAME && verification.value === false) {
+                    if (paragraphStyleName(para) === STYLE_NAME &&
+                        verification.value === false) {
                         fixedCount++;
                     } else {
                         failedCount++;
@@ -483,6 +612,7 @@ ExtendScript / ECMAScript 3 compatible.
         alert("NormalFix selected remediation complete.\n\n" +
               "Corrected: " + fixedCount + "\n" +
               "Skipped: " + skippedCount + "\n" +
+              "Skipped because now inside a table: " + tableSkippedCount + "\n" +
               "Could not verify: " + failedCount + "\n\n" +
               "The document was rescanned. Review the result before saving the document.");
     }
@@ -496,11 +626,14 @@ ExtendScript / ECMAScript 3 compatible.
     }
 
     function isFixableFinding(row) {
-        return row !== null && row !== undefined &&
+        return row !== null &&
+               row !== undefined &&
                row.code === FINDING_CODE &&
                row.style === STYLE_NAME &&
                row.overrides === true &&
-               row.paragraph !== null && valid(row.paragraph);
+               row.paragraph !== null &&
+               valid(row.paragraph) &&
+               !isInsideTable(row.paragraph);
     }
 
     function saveCSV() {
@@ -512,6 +645,7 @@ ExtendScript / ECMAScript 3 compatible.
         if (target === null) {
             return;
         }
+
         if (!/\.csv$/i.test(target.name)) {
             target = new File(target.fsName + ".csv");
         }
@@ -519,6 +653,7 @@ ExtendScript / ECMAScript 3 compatible.
         f = new File(target.fsName);
         f.encoding = "UTF-8";
         f.lineFeed = "Windows";
+
         if (!f.open("w")) {
             alert("NormalFix could not open the selected file for writing.");
             return;
@@ -542,7 +677,10 @@ ExtendScript / ECMAScript 3 compatible.
 
         f.close();
         status("CSV saved: " + target.fsName);
-        alert("NormalFix CSV saved.\n\n" + target.fsName);
+
+        alert("NormalFix CSV saved.\n\n" + target.fsName + "\n\n" +
+              "Normal paragraphs inside tables were excluded from this findings CSV: " +
+              counts.tableNormalExcluded);
     }
 
     function sortRows() {
@@ -560,11 +698,14 @@ ExtendScript / ECMAScript 3 compatible.
     function numericOrTextCompare(a, b) {
         var na = Number(a);
         var nb = Number(b);
+
         if (!isNaN(na) && !isNaN(nb)) {
             return na - nb;
         }
+
         a = String(a);
         b = String(b);
+
         if (a < b) { return -1; }
         if (a > b) { return 1; }
         return 0;
@@ -572,15 +713,19 @@ ExtendScript / ECMAScript 3 compatible.
 
     function previewText(value) {
         var s = String(value).replace(/\u00A0/g, " ");
+
         s = s.replace(/[\r\n\t]+/g, " ");
         s = s.replace(/  +/g, " ");
         s = s.replace(/^ +/, "").replace(/ +$/, "");
+
         if (s.length === 0) {
             return "<empty paragraph>";
         }
+
         if (s.length > 140) {
             s = s.substring(0, 137) + "...";
         }
+
         return s;
     }
 
@@ -593,15 +738,27 @@ ExtendScript / ECMAScript 3 compatible.
     }
 
     function safeContents(para) {
-        try { return para.contents; } catch (e) { return ""; }
+        try {
+            return para.contents;
+        } catch (e) {
+            return "";
+        }
     }
 
     function valid(obj) {
-        try { return obj !== null && obj.isValid === true; } catch (e) { return false; }
+        try {
+            return obj !== null && obj.isValid === true;
+        } catch (e) {
+            return false;
+        }
     }
 
     function property(obj, name, fallback) {
-        try { return String(obj[name]); } catch (e) { return fallback; }
+        try {
+            return String(obj[name]);
+        } catch (e) {
+            return fallback;
+        }
     }
 
     function overrideText(value) {
@@ -613,42 +770,65 @@ ExtendScript / ECMAScript 3 compatible.
 
     function fixed(value, width) {
         var s = String(value);
-        while (s.length < width) { s += " "; }
-        if (s.length > width) { s = s.substring(0, width - 3) + "..."; }
+
+        while (s.length < width) {
+            s += " ";
+        }
+
+        if (s.length > width) {
+            s = s.substring(0, width - 3) + "...";
+        }
+
         return s;
     }
 
     function csv(values) {
-        var out = [], i, s;
+        var out = [];
+        var i, s;
+
         for (i = 0; i < values.length; i++) {
             s = String(values[i]).replace(/"/g, "\"\"");
             out.push("\"" + s + "\"");
         }
+
         return out.join(",");
     }
 
     function defaultFile(doc, name) {
         var folder = Folder.desktop;
+
         try {
             if (doc.saved && doc.filePath && doc.filePath.exists) {
                 folder = doc.filePath;
             }
         } catch (e) {}
+
         return new File(folder.fsName + "/" + name);
     }
 
     function docName(doc) {
-        try { return String(doc.name); } catch (e) { return "Active document"; }
+        try {
+            return String(doc.name);
+        } catch (e) {
+            return "Active document";
+        }
     }
 
     function baseName(doc) {
-        return docName(doc).replace(/\.indd$/i, "").replace(/[\\\/:*?"<>|]/g, "_");
+        return docName(doc)
+            .replace(/\.indd$/i, "")
+            .replace(/[\\\/:*?"<>|]/g, "_");
     }
 
     function timestamp() {
         var d = new Date();
-        return d.getFullYear() + two(d.getMonth() + 1) + two(d.getDate()) + "-" +
-               two(d.getHours()) + two(d.getMinutes()) + two(d.getSeconds());
+
+        return d.getFullYear() +
+               two(d.getMonth() + 1) +
+               two(d.getDate()) + "-" +
+               two(d.getHours()) +
+               two(d.getMinutes()) +
+               two(d.getSeconds());
     }
 
     function two(n) {
@@ -657,10 +837,16 @@ ExtendScript / ECMAScript 3 compatible.
 
     function status(text) {
         ui.status.text = text;
-        try { ui.win.update(); } catch (e) {}
+        try {
+            ui.win.update();
+        } catch (e) {}
     }
 
     function errorLine(err) {
-        try { return err.line; } catch (e) { return "?"; }
+        try {
+            return err.line;
+        } catch (e) {
+            return "?";
+        }
     }
 }());

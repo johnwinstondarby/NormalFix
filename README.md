@@ -1,66 +1,71 @@
 # NormalFix
 
-NormalFix is an Adobe InDesign ExtendScript utility for locating paragraphs that use the paragraph style `Normal` but contain local/manual formatting overrides. In the InDesign Paragraph Styles panel, this condition is commonly displayed as `Normal+`.
+NormalFix is an Adobe InDesign ExtendScript utility for locating and selectively correcting paragraphs that use the paragraph style `Normal` but contain local/manual formatting overrides. In the Paragraph Styles panel, this condition is commonly displayed as `Normal+`.
 
-## v1.4 scope
+## v1.5 scope
 
-NormalFix v1.4 makes table membership the exclusion boundary.
+NormalFix v1.5 completes the guarded body-text remediation path by preserving applied character styles and standardizing red CLI text before paragraph cleanup.
 
 It:
 
 1. scans every paragraph in every story in the active InDesign document;
-2. checks whether each paragraph is inside a table before testing paragraph style;
-3. excludes every paragraph inside a table, regardless of paragraph style;
-4. therefore ignores table paragraphs using `Table Heading`, `Table First Column`, `Table Other Columns`, `Normal`, or any future table paragraph style;
-5. leaves applied table character styles, including `CLI Code Red Table`, entirely outside NormalFix scope;
-6. reports the total number of table paragraphs excluded;
-7. audits only `Normal` paragraphs outside tables;
-8. detects local paragraph-style overrides with Adobe's `textHasOverrides(StyleType.PARAGRAPH_STYLE_TYPE, false)` method;
-9. does not count an applied character style by itself as a paragraph-style override;
-10. records page, Story ID, Frame ID, paragraph index, text preview, and override-detection method;
-11. supports Ctrl-click and Shift-click multi-selection in the findings list;
-12. provides **Locate** for the first selected finding;
-13. provides **Fix Selected to Normal** for one or more explicitly selected, verified `NF-001` findings outside tables;
-14. re-checks the table exclusion immediately before remediation so a stale row cannot be changed after moving into a table;
-15. verifies every correction, rescans the document, and reports outcome totals;
-16. exports only eligible outside-table findings to CSV.
+2. excludes every paragraph inside a table before any paragraph-style test;
+3. audits only paragraphs outside tables whose paragraph style is exactly `Normal`;
+4. detects local paragraph-style overrides with `textHasOverrides(StyleType.PARAGRAPH_STYLE_TYPE, false)`;
+5. supports single-selection and Ctrl-click/Shift-click multi-selection;
+6. re-checks every selected paragraph immediately before remediation;
+7. detects red-family text at character precision;
+8. assigns contiguous red-family ranges to the existing character style `CLI Code Red Body`;
+9. applies `Normal` without clearing character attributes;
+10. clears paragraph-only overrides;
+11. verifies the final `Normal` state, character-style assignments, and red-text positions;
+12. rescans automatically and reports corrected, skipped, and unverified totals;
+13. exports only outside-table findings to CSV.
 
-NormalFix v1.4 has no document-wide **Fix All** action.
+NormalFix has no document-wide **Fix All** action. Selection remains the remediation boundary.
 
 ## Ownership boundary
 
 NormalFix owns `Normal` paragraphs outside tables.
 
-TableFix owns all paragraph-style, character-style, cell-formatting, and structural remediation inside tables.
+TableFix owns all text and structure inside tables. NormalFix therefore ignores table content regardless of whether the table currently uses `Table Heading`, `Table First Column`, `Table Other Columns`, legacy `Normal`, `CLI Code Red Table`, or any future table style.
 
-This boundary is based on location rather than style name. Once a paragraph is inside a table, NormalFix ignores it even if the paragraph still uses `Normal` because the table has not yet completed its TableFix QA pass.
+## Red CLI body text
 
-Current table styles include:
+The production character style is:
 
-- Paragraph style `Table Heading`
-- Paragraph style `Table First Column`
-- Paragraph style `Table Other Columns`
-- Legacy/unremediated paragraph style `Normal`
-- Character style `CLI Code Red Table`
+- `CLI Code Red Body`
+- Aptos Display
+- 11 pt
+- RGB `202,23,30`
 
-These names document the current table model; the exclusion does not depend on them.
+Before paragraph cleanup, NormalFix detects red-family characters and applies `CLI Code Red Body` to contiguous red ranges. The detector accepts named red swatches and color values that fall within a broad red hue family after RGB conversion. This allows older/manual reds to be standardized even when their source RGB values differ from `202,23,30`.
+
+If red-family text is present and `CLI Code Red Body` cannot be resolved exactly once, NormalFix makes no change to the selected paragraph. If the style resolves to a clearly different RGB color, remediation is also blocked.
+
+## Character-style preservation
+
+v1.5 replaces the earlier `applyParagraphStyle(style, true)` remediation with:
+
+```javascript
+para.applyParagraphStyle(canonicalStyle, false);
+para.clearOverrides(OverrideType.PARAGRAPH_ONLY);
+```
+
+This changes paragraph-level formatting without intentionally clearing applied character styles. NormalFix records the applied character-style pattern after red text is standardized and verifies that the pattern is unchanged after paragraph cleanup.
+
+Red character positions are also verified after remediation.
+
+NormalFix deliberately does not erase unrelated anonymous character-level formatting merely to force a PASS. If such formatting leaves the paragraph in a verified override state, the paragraph is reported as **Could not verify** and remains available for review.
 
 ## Finding codes
 
 | Code | Severity | Meaning |
 | --- | --- | --- |
-| `NF-001` | WARNING | `Normal` is applied outside a table and local/manual formatting overrides exist. Eligible for **Fix Selected to Normal**. |
+| `NF-001` | WARNING | `Normal` is applied outside a table and local/manual formatting overrides exist. Eligible for selected remediation. |
 | `NF-002` | WARNING | `Normal` is applied outside a table but NormalFix could not verify override state. Locate-only. |
 
 Clean eligible `Normal` paragraphs are counted in the summary but are not added to the findings list.
-
-## Current remediation caution
-
-v1.4 retains the current remediation operation `applyParagraphStyle(style, true)`. That operation can remove intentional character-level or manual formatting from a selected body paragraph.
-
-Do not use **Fix Selected to Normal** on body paragraphs containing intentional inline formatting until the character-style-preservation update is completed.
-
-The scanner remains useful because applied character styles are not counted by themselves as paragraph-style overrides.
 
 ## Compatibility
 

@@ -2,18 +2,18 @@
 #targetengine "NormalFix"
 
 /*
-NormalFix v1.1
+NormalFix v1.2
 Audit and selected remediation for paragraphs using the paragraph style Normal
 with local/manual formatting overrides. InDesign commonly displays this state as Normal+.
 
-v1.1 adds guarded remediation for one selected NF-001 finding at a time.
-No bulk remediation is provided.
+v1.2 adds multi-select remediation for explicitly selected NF-001 findings.
+No document-wide bulk remediation is provided.
 
 ExtendScript / ECMAScript 3 compatible.
 */
 
 (function () {
-    var VERSION = "1.1";
+    var VERSION = "1.2";
     var STYLE_NAME = "Normal";
     var FINDING_CODE = "NF-001";
     var UNKNOWN_CODE = "NF-002";
@@ -92,7 +92,7 @@ ExtendScript / ECMAScript 3 compatible.
             sortRows();
             refresh(doc);
             if (rows.length > 0) {
-                status("Scan complete. Select a finding to Locate or Fix Selected to Normal.");
+                status("Scan complete. Select one or more findings to Locate or Fix Selected to Normal.");
             } else {
                 status("Scan complete. No Normal+ findings were detected.");
             }
@@ -155,11 +155,14 @@ ExtendScript / ECMAScript 3 compatible.
     function overrideState(para) {
         var value;
 
+        // Primary Adobe DOM method. false means an applied character style by itself
+        // is not counted as a paragraph-style override.
         try {
             value = para.textHasOverrides(StyleType.PARAGRAPH_STYLE_TYPE, false);
             return {value: value === true, method: "textHasOverrides"};
         } catch (ePrimary) {}
 
+        // Read-only fallback for ExtendScript DOM variations.
         try {
             value = para.styleOverridden;
             return {value: value === true, method: "styleOverridden fallback"};
@@ -237,7 +240,7 @@ ExtendScript / ECMAScript 3 compatible.
         ui.summary = ui.win.add("statictext", undefined, "", {multiline: true});
         ui.summary.preferredSize = [900, 64];
 
-        ui.list = ui.win.add("listbox", undefined, [], {multiselect: false});
+        ui.list = ui.win.add("listbox", undefined, [], {multiselect: true});
         ui.list.preferredSize = [900, 400];
         ui.list.onDoubleClick = locate;
 
@@ -296,16 +299,17 @@ ExtendScript / ECMAScript 3 compatible.
     }
 
     function locate() {
+        var selected = selectedRows();
         var row, para, located = false;
 
-        if (ui.list.selection === null) {
+        if (selected.length === 0) {
             alert("Select a NormalFix finding first.");
             return;
         }
 
-        row = rows[ui.list.selection.index];
+        row = selected[0];
         if (!row || row.paragraph === null || !valid(row.paragraph)) {
-            alert("This finding no longer has a valid paragraph to locate.");
+            alert("The first selected finding no longer has a valid paragraph to locate.");
             return;
         }
 
@@ -333,81 +337,95 @@ ExtendScript / ECMAScript 3 compatible.
         }
 
         if (located) {
-            status("Located " + row.code + " at " + row.location + ".");
+            status("Located " + row.code + " at " + row.location +
+                   (selected.length > 1 ? ". " + selected.length + " findings are selected." : "."));
         } else {
             alert("InDesign could not navigate to this paragraph.\n\n" + row.location);
         }
     }
 
-    function fixSelected() {
-        var row;
-        var preview;
+    function selectedRows() {
+        var selection = ui.list.selection;
+        var selected = [];
+        var i, item;
 
-        if (ui.list.selection === null) {
-            alert("Select a verified Normal+ finding first.");
-            return;
+        if (selection === null) {
+            return selected;
         }
 
-        row = rows[ui.list.selection.index];
-        if (!isFixableFinding(row)) {
-            alert("Only verified NF-001 Normal+ findings can be fixed.\n\nNF-002 unknown-state rows are locate-only.");
-            return;
-        }
+        // ScriptUI returns one ListItem for a single selection and an array-like
+        // collection when multiselect contains more than one item.
+        try {
+            if (selection.length !== undefined && selection.index === undefined) {
+                for (i = 0; i < selection.length; i++) {
+                    item = selection[i];
+                    if (item !== null && item !== undefined && item.index !== undefined && rows[item.index] !== undefined) {
+                        selected.push(rows[item.index]);
+                    }
+                }
+            } else if (selection.index !== undefined && rows[selection.index] !== undefined) {
+                selected.push(rows[selection.index]);
+            }
+        } catch (eSelection) {}
 
-        preview = row.preview;
-        if (preview.length > 180) {
-            preview = preview.substring(0, 177) + "...";
-        }
-
-        if (!confirm("NormalFix will restore this paragraph to the Normal paragraph style and clear its local/manual formatting overrides.\n\n" +
-                     "This affects the entire selected paragraph.\n\n" +
-                     row.location + "\n\n" +
-                     "Text: " + preview + "\n\nContinue?")) {
-            return;
-        }
-
-        fixRow(row);
+        return selected;
     }
 
-    function fixRow(row) {
-        var para = row.paragraph;
-        var currentStyle;
-        var currentOverride;
-        var canonicalStyle;
-        var verification;
-        var oldRedraw = null;
-        var succeeded = false;
-        var reason = "";
+    function fixSelected() {
+        var selected = selectedRows();
+        var targets = [];
+        var ineligible = 0;
+        var i, row;
+        var message;
 
-        if (!valid(para)) {
-            alert("The selected paragraph is no longer valid. Rescan the document and try again.");
+        if (selected.length === 0) {
+            alert("Select one or more verified Normal+ findings first.");
             return;
         }
 
-        currentStyle = paragraphStyleName(para);
-        currentOverride = overrideState(para);
-
-        if (currentStyle !== STYLE_NAME) {
-            alert("The selected paragraph no longer uses the Normal paragraph style.\n\nNo change was made. Rescan the document.");
-            return;
-        }
-        if (currentOverride.value !== true) {
-            alert("The selected paragraph no longer has a verified Normal+ override.\n\nNo change was made. Rescan the document.");
-            return;
-        }
-
-        try {
-            canonicalStyle = para.appliedParagraphStyle;
-            if (!valid(canonicalStyle) || String(canonicalStyle.name) !== STYLE_NAME) {
-                alert("NormalFix could not resolve the selected paragraph's Normal style.\n\nNo change was made.");
-                return;
+        for (i = 0; i < selected.length; i++) {
+            row = selected[i];
+            if (isFixableFinding(row)) {
+                targets.push(row);
+            } else {
+                ineligible++;
             }
-        } catch (eStyle) {
-            alert("NormalFix could not resolve the selected paragraph's Normal style.\n\nNo change was made.");
+        }
+
+        if (targets.length === 0) {
+            alert("None of the selected rows are verified NF-001 Normal+ findings.\n\nNF-002 unknown-state rows are locate-only.");
             return;
         }
 
-        status("Fixing selected Normal+ paragraph...");
+        if (targets.length === 1) {
+            message = "NormalFix will restore the selected paragraph to the Normal paragraph style and clear its local/manual formatting overrides.\n\n" +
+                      "This affects the entire selected paragraph.\n\n" +
+                      targets[0].location + "\n\n" +
+                      "Text: " + shortPreview(targets[0].preview);
+        } else {
+            message = "NormalFix will restore " + targets.length + " selected paragraphs to the Normal paragraph style and clear their local/manual formatting overrides.\n\n" +
+                      "Only the explicitly selected, verified NF-001 findings will be changed.";
+        }
+
+        if (ineligible > 0) {
+            message += "\n\nSelected but ineligible rows that will be skipped: " + ineligible;
+        }
+
+        if (!confirm(message + "\n\nContinue?")) {
+            return;
+        }
+
+        fixRows(targets);
+    }
+
+    function fixRows(targets) {
+        var fixedCount = 0;
+        var skippedCount = 0;
+        var failedCount = 0;
+        var oldRedraw = null;
+        var i, row, para, currentStyle, currentOverride, canonicalStyle, verification;
+
+        status("Fixing " + targets.length + " selected Normal+ paragraph(s)...");
 
         try {
             oldRedraw = app.scriptPreferences.enableRedraw;
@@ -415,16 +433,43 @@ ExtendScript / ECMAScript 3 compatible.
         } catch (eRedraw) {}
 
         try {
-            para.applyParagraphStyle(canonicalStyle, true);
-            verification = overrideState(para);
+            for (i = 0; i < targets.length; i++) {
+                row = targets[i];
+                para = row.paragraph;
 
-            if (paragraphStyleName(para) === STYLE_NAME && verification.value === false) {
-                succeeded = true;
-            } else {
-                reason = "NormalFix applied Normal but could not verify that all overrides cleared.";
+                if (!valid(para)) {
+                    skippedCount++;
+                    continue;
+                }
+
+                currentStyle = paragraphStyleName(para);
+                currentOverride = overrideState(para);
+
+                // Guard against stale rows or paragraphs edited after the scan.
+                if (currentStyle !== STYLE_NAME || currentOverride.value !== true) {
+                    skippedCount++;
+                    continue;
+                }
+
+                try {
+                    canonicalStyle = para.appliedParagraphStyle;
+                    if (!valid(canonicalStyle) || String(canonicalStyle.name) !== STYLE_NAME) {
+                        skippedCount++;
+                        continue;
+                    }
+
+                    para.applyParagraphStyle(canonicalStyle, true);
+                    verification = overrideState(para);
+
+                    if (paragraphStyleName(para) === STYLE_NAME && verification.value === false) {
+                        fixedCount++;
+                    } else {
+                        failedCount++;
+                    }
+                } catch (eFix) {
+                    failedCount++;
+                }
             }
-        } catch (eFix) {
-            reason = "InDesign reported an error while applying Normal: " + eFix.message;
         } finally {
             if (oldRedraw !== null) {
                 try {
@@ -435,11 +480,19 @@ ExtendScript / ECMAScript 3 compatible.
 
         scan();
 
-        if (succeeded) {
-            alert("NormalFix correction complete.\n\nThe selected paragraph now uses Normal with no verified local override.\n\nThe document was rescanned. Review the result before saving the document.");
-        } else {
-            alert("NormalFix could not verify the correction.\n\n" + reason + "\n\nThe document was rescanned. Review the current finding before saving the document.");
+        alert("NormalFix selected remediation complete.\n\n" +
+              "Corrected: " + fixedCount + "\n" +
+              "Skipped: " + skippedCount + "\n" +
+              "Could not verify: " + failedCount + "\n\n" +
+              "The document was rescanned. Review the result before saving the document.");
+    }
+
+    function shortPreview(value) {
+        var s = String(value);
+        if (s.length > 180) {
+            s = s.substring(0, 177) + "...";
         }
+        return s;
     }
 
     function isFixableFinding(row) {

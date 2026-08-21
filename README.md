@@ -70,3 +70,24 @@ Clean eligible `Normal` paragraphs are counted in the summary but are not added 
 ## Compatibility
 
 The script is written for Adobe InDesign ExtendScript / ECMAScript 3 compatibility.
+
+## Development validation
+
+A production-manuscript read-only sweep on August 21, 2026 exercised all 2,883 `NF-001` targets in the 505-page production manuscript against the frozen 243-key read surface. The locator resolved 2,883 of 2,883 targets with zero locator failures. Exact-key checks produced zero key-set mismatches and zero unexpected `NOT_APPLICABLE` results.
+
+The same sweep exposed a production-only snapshot-readiness defect in object-valued properties. The affected properties were `characters.appliedLanguage`, `characters.fillColor`, `paragraph.bulletsCharacterStyle`, and `paragraph.numberingCharacterStyle`. The current development hypothesis is one common host-object identity/serialization defect rather than four property-specific defects. `composition.frameSpanSignature` also failed on every production target and remains a separate diagnostic question until the production canary identifies its failing operation.
+
+Development artifacts for that work live under `docs/` and `canary/`:
+
+- `docs/NORMALFIX_OBJECT_IDENTITY_CONTRACT_v0_1.md` defines the proposed durable semantic identity and refusal contract. Exact semantic identity is required; supplemental ID or object specifier data cannot authorize a partial match.
+- `canary/NormalFix_ObjectIdentity_Reference_v0_1_0.jsxinc` is a test-only reference implementation of that contract. Passing canaries does not promote it into production code.
+- `canary/NormalFix_ProductionIdentity_Diagnostic_v0_1_0.jsx` is a **read-only, no-Harness** production-manuscript diagnostic. It uses pre-existing manuscript targets, probes the object-valued properties, positive `strokeColor`/`kerningValue` discrimination surface, legacy-resolution timing, and two independent frame-span paths.
+- `canary/NormalFix_ObjectIdentity_Adversarial_v0_1_0.jsx` creates a disposable saved/reopened document and proves refusal behavior for duplicate style names, qualified-path changes, swatch renames, and conflicting supplemental IDs. It does not modify the production manuscript.
+
+The production `NormalFix.jsx` remains unchanged while these diagnostics run. ScriptWatch Harness 1.2 is intentionally absent from the production diagnostic canary so the serializer/frame investigation has one variable. Harness adoption begins with the first 20-to-50-target post-fix production rerun after the failure mechanism is established.
+
+### Production discrimination rule
+
+Object-valued, container-sensitive, and universally sentinel-valued properties require evidence from pre-existing document-resident state before they are trusted on a production proof surface. Synthetic fixtures remain useful but cannot be the sole authority for those property classes.
+
+A universally `NOT_APPLICABLE`, null, or default result also requires at least one deliberate positive case proving that the property can produce a real discriminating value. This is the current gate for `characters.kerningValue` and for a non-default `characters.strokeColor` case.

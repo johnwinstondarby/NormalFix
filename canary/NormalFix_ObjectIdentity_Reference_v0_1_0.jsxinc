@@ -1,0 +1,357 @@
+/*
+NormalFix object identity reference implementation v0.1.0
+
+Development canary code only. This file is not production NormalFix code.
+It encodes the proposed strict object-reference identity contract so the
+production-manuscript and adversarial canaries can test one implementation.
+
+ExtendScript / ECMAScript 3.
+*/
+
+var NormalFixObjectIdentity = (function () {
+    var VERSION = "0.1.0";
+
+    function valid(obj) {
+        if (obj === null || obj === undefined) { return false; }
+        try { if (obj.isValid === false) { return false; } } catch (eValid) {}
+        return true;
+    }
+
+    function typeName(obj) {
+        var out = "";
+        if (obj === null || obj === undefined) { return out; }
+        try {
+            if (obj.reflect && obj.reflect.name) {
+                out = String(obj.reflect.name);
+                if (out.length > 0) { return out; }
+            }
+        } catch (eReflect) {}
+        try {
+            if (obj.constructorName !== undefined) {
+                out = String(obj.constructorName);
+                if (out.length > 0) { return out; }
+            }
+        } catch (eConstructorName) {}
+        try {
+            if (obj.constructor && obj.constructor.name) {
+                out = String(obj.constructor.name);
+            }
+        } catch (eConstructor) {}
+        return out;
+    }
+
+    function safeStringProperty(obj, prop) {
+        try {
+            if (obj[prop] === undefined || obj[prop] === null) { return ""; }
+            return String(obj[prop]);
+        } catch (e) {
+            return "";
+        }
+    }
+
+    function safeSpecifier(obj) {
+        try { return String(obj.toSpecifier()); } catch (e) { return ""; }
+    }
+
+    function objectId(obj) {
+        return safeStringProperty(obj, "id");
+    }
+
+    function familyForType(type) {
+        var t = String(type || "");
+        if (t.indexOf("Language") >= 0) { return "Language"; }
+        if (t.indexOf("CharacterStyle") >= 0) { return "CharacterStyle"; }
+        if (t.indexOf("ParagraphStyle") >= 0) { return "ParagraphStyle"; }
+        if (t.indexOf("Font") >= 0) { return "Font"; }
+        if (t.indexOf("StrokeStyle") >= 0) { return "StrokeStyle"; }
+        if (t.indexOf("NumberingList") >= 0) { return "NumberingList"; }
+        if (t.indexOf("Swatch") >= 0 ||
+            t.indexOf("Color") >= 0 ||
+            t.indexOf("Gradient") >= 0 ||
+            t.indexOf("Tint") >= 0 ||
+            t.indexOf("MixedInk") >= 0) {
+            return "Swatch";
+        }
+        return "Unsupported";
+    }
+
+    function isNamedGroupType(type) {
+        return type === "CharacterStyleGroup" ||
+               type === "ParagraphStyleGroup" ||
+               type === "ColorGroup" ||
+               type === "SwatchGroup";
+    }
+
+    function qualifiedPath(obj) {
+        var pieces = [];
+        var ownName = safeStringProperty(obj, "name");
+        var node = null;
+        var depth = 0;
+        var t, n;
+
+        if (ownName.length > 0) { pieces.unshift(ownName); }
+
+        try { node = obj.parent; } catch (eParent) { node = null; }
+        while (valid(node) && depth < 24) {
+            t = typeName(node);
+            if (isNamedGroupType(t)) {
+                n = safeStringProperty(node, "name");
+                if (n.length > 0) { pieces.unshift(n); }
+            }
+            if (t === "Document" || t === "Application") { break; }
+            try { node = node.parent; } catch (eNext) { break; }
+            depth++;
+        }
+        return pieces.join("/");
+    }
+
+    function describe(obj) {
+        var t = typeName(obj);
+        return {
+            typeName: t,
+            family: familyForType(t),
+            name: safeStringProperty(obj, "name"),
+            id: objectId(obj),
+            path: qualifiedPath(obj),
+            specifier: safeSpecifier(obj),
+            postscriptName: safeStringProperty(obj, "postscriptName"),
+            fullName: safeStringProperty(obj, "fullName")
+        };
+    }
+
+    function identity(obj) {
+        var d = describe(obj);
+        var s = {
+            kind: "host_identity",
+            contractVersion: VERSION,
+            family: d.family,
+            typeName: d.typeName,
+            name: d.name,
+            path: d.path,
+            id: d.id,
+            postscriptName: d.postscriptName,
+            fullName: d.fullName,
+            specifier: d.specifier
+        };
+
+        if (s.family === "Unsupported") {
+            return {ok:false, status:"UNSUPPORTED_TYPE", state:s};
+        }
+        if (s.family === "Font") {
+            if (s.postscriptName.length === 0 && s.fullName.length === 0 && s.name.length === 0) {
+                return {ok:false, status:"INCOMPLETE_IDENTITY", state:s};
+            }
+            return {ok:true, status:"SERIALIZED", state:s};
+        }
+        if (s.name.length === 0) {
+            return {ok:false, status:"INCOMPLETE_IDENTITY", state:s};
+        }
+        if ((s.family === "CharacterStyle" || s.family === "ParagraphStyle") && s.path.length === 0) {
+            return {ok:false, status:"INCOMPLETE_IDENTITY", state:s};
+        }
+        return {ok:true, status:"SERIALIZED", state:s};
+    }
+
+    function collectionItems(collection) {
+        var out = [];
+        var i, item;
+        if (!collection) { return out; }
+        try {
+            if (collection instanceof Array) {
+                for (i = 0; i < collection.length; i++) { out.push(collection[i]); }
+                return out;
+            }
+        } catch (eArray) {}
+        try {
+            for (i = 0; i < collection.length; i++) {
+                try {
+                    item = collection.item ? collection.item(i) : collection[i];
+                    if (valid(item)) { out.push(item); }
+                } catch (eItem) {}
+            }
+        } catch (eCollection) {}
+        return out;
+    }
+
+    function styleCandidates(doc, family) {
+        var out = [];
+        var source = null;
+        try {
+            source = family === "CharacterStyle" ? doc.allCharacterStyles : doc.allParagraphStyles;
+        } catch (eAll) { source = null; }
+        out = collectionItems(source);
+        if (out.length > 0) { return out; }
+        try {
+            source = family === "CharacterStyle" ? doc.characterStyles : doc.paragraphStyles;
+        } catch (eTop) { source = null; }
+        return collectionItems(source);
+    }
+
+    function languageCandidates() {
+        var out = [];
+        var source = null;
+        try { source = app.languagesWithVendors; } catch (eLWV) { source = null; }
+        out = collectionItems(source);
+        if (out.length > 0) { return out; }
+        try { source = app.languages; } catch (eLang) { source = null; }
+        return collectionItems(source);
+    }
+
+    function candidates(doc, state) {
+        var family = state.family;
+        var source = null;
+        if (family === "CharacterStyle" || family === "ParagraphStyle") {
+            return styleCandidates(doc, family);
+        }
+        if (family === "Language") {
+            return languageCandidates();
+        }
+        if (family === "Swatch") {
+            try { source = doc.swatches; } catch (eSwatch) { source = null; }
+            return collectionItems(source);
+        }
+        if (family === "StrokeStyle") {
+            try { source = doc.strokeStyles; } catch (eStroke) { source = null; }
+            return collectionItems(source);
+        }
+        if (family === "NumberingList") {
+            try { source = doc.numberingLists; } catch (eList) { source = null; }
+            return collectionItems(source);
+        }
+        if (family === "Font") {
+            try { source = app.fonts; } catch (eFonts) { source = null; }
+            return collectionItems(source);
+        }
+        return [];
+    }
+
+    function primaryMatches(obj, state) {
+        var d = describe(obj);
+        if (state.family === "Font") {
+            if (state.postscriptName.length > 0) {
+                return d.postscriptName === state.postscriptName;
+            }
+            if (state.fullName.length > 0) { return d.fullName === state.fullName; }
+            return d.name === state.name;
+        }
+        if (d.family !== state.family) { return false; }
+        if (d.name !== state.name) { return false; }
+        if (state.family === "CharacterStyle" || state.family === "ParagraphStyle") {
+            return d.path === state.path;
+        }
+        if (state.path.length > 0 && d.path.length > 0 && d.path !== state.path) {
+            return false;
+        }
+        return true;
+    }
+
+    function idCandidate(items, state) {
+        var i;
+        if (!state.id || state.id.length === 0) { return null; }
+        for (i = 0; i < items.length; i++) {
+            if (objectId(items[i]) === state.id) { return items[i]; }
+        }
+        return null;
+    }
+
+    function resolve(doc, state) {
+        var started = new Date().getTime();
+        var items, matches = [], i, byId, d;
+        if (!state || state.kind !== "host_identity") {
+            return {ok:false, status:"INVALID_STATE", candidate:null, elapsedMs:0};
+        }
+        if (state.contractVersion !== VERSION) {
+            return {ok:false, status:"CONTRACT_VERSION_MISMATCH", candidate:null, elapsedMs:0};
+        }
+        if (state.family === "Unsupported") {
+            return {ok:false, status:"UNSUPPORTED_TYPE", candidate:null, elapsedMs:0};
+        }
+        items = candidates(doc, state);
+        for (i = 0; i < items.length; i++) {
+            try {
+                if (valid(items[i]) && primaryMatches(items[i], state)) {
+                    matches.push(items[i]);
+                }
+            } catch (eMatch) {}
+        }
+        if (matches.length > 1) {
+            return {ok:false, status:"AMBIGUOUS_IDENTITY", candidate:null,
+                    elapsedMs:new Date().getTime() - started, matchCount:matches.length};
+        }
+        if (matches.length === 0) {
+            byId = idCandidate(items, state);
+            if (valid(byId)) {
+                d = describe(byId);
+                return {ok:false, status:"IDENTITY_CONFLICT", candidate:byId,
+                        detail:"supplemental ID resolves but semantic identity differs: " +
+                               d.family + "|" + d.path,
+                        elapsedMs:new Date().getTime() - started, matchCount:0};
+            }
+            return {ok:false, status:"UNRESOLVED_IDENTITY", candidate:null,
+                    elapsedMs:new Date().getTime() - started, matchCount:0};
+        }
+        if (state.id && state.id.length > 0 && objectId(matches[0]) !== state.id) {
+            return {ok:false, status:"IDENTITY_CONFLICT", candidate:matches[0],
+                    detail:"semantic identity matches but supplemental ID differs",
+                    elapsedMs:new Date().getTime() - started, matchCount:1};
+        }
+        return {ok:true, status:"RESOLVED", candidate:matches[0],
+                elapsedMs:new Date().getTime() - started, matchCount:1};
+    }
+
+    function resolveSpecifierVerified(doc, state) {
+        var started = new Date().getTime();
+        var resolved, candidate, d;
+        if (!state || !state.specifier || state.specifier.length === 0) {
+            return {ok:false, status:"NO_SPECIFIER", elapsedMs:0};
+        }
+        try {
+            resolved = app.resolve(state.specifier);
+            if (!resolved || resolved.length !== 1 || !valid(resolved[0])) {
+                return {ok:false, status:"SPECIFIER_UNRESOLVED",
+                        elapsedMs:new Date().getTime() - started};
+            }
+            candidate = resolved[0];
+            if (!primaryMatches(candidate, state)) {
+                d = describe(candidate);
+                return {ok:false, status:"SPECIFIER_IDENTITY_CONFLICT",
+                        detail:d.family + "|" + d.path,
+                        elapsedMs:new Date().getTime() - started};
+            }
+            if (state.id && state.id.length > 0 && objectId(candidate) !== state.id) {
+                return {ok:false, status:"SPECIFIER_IDENTITY_CONFLICT",
+                        detail:"supplemental ID differs",
+                        elapsedMs:new Date().getTime() - started};
+            }
+            return {ok:true, status:"SPECIFIER_VERIFIED", candidate:candidate,
+                    elapsedMs:new Date().getTime() - started};
+        } catch (eResolve) {
+            return {ok:false, status:"SPECIFIER_ERROR", detail:eResolve.message,
+                    elapsedMs:new Date().getTime() - started};
+        }
+    }
+
+    function cloneState(state) {
+        var copy = {};
+        var key;
+        for (key in state) {
+            try {
+                if (state.hasOwnProperty && !state.hasOwnProperty(key)) { continue; }
+            } catch (eOwn) {}
+            copy[key] = state[key];
+        }
+        return copy;
+    }
+
+    return {
+        VERSION: VERSION,
+        valid: valid,
+        typeName: typeName,
+        safeStringProperty: safeStringProperty,
+        describe: describe,
+        identity: identity,
+        resolve: resolve,
+        resolveSpecifierVerified: resolveSpecifierVerified,
+        cloneState: cloneState
+    };
+}());

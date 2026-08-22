@@ -91,3 +91,14 @@ The production `NormalFix.jsx` remains unchanged while these diagnostics run. Sc
 Object-valued, container-sensitive, and universally sentinel-valued properties require evidence from pre-existing document-resident state before they are trusted on a production proof surface. Synthetic fixtures remain useful but cannot be the sole authority for those property classes.
 
 A universally `NOT_APPLICABLE`, null, or default result also requires at least one deliberate positive case proving that the property can produce a real discriminating value. This is the current gate for `characters.kerningValue` and for a non-default `characters.strokeColor` case.
+
+## License
+
+Copyright (C) 2026 John Darby
+
+NormalFix is free software, released under the GNU General Public License,
+version 3 or later. You may redistribute and modify it under those terms.
+See [LICENSE](LICENSE) for the full text.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY. See the GNU General Public License for details.

@@ -1,0 +1,244 @@
+Key,Category,Snapshot Role,Digest Role,Proof / Evidence
+text.targetContents,text,RECONSTRUCTIVE,REQUIRED,Exact target text; formatting-only invariant
+text.storyFingerprint,text,COVERAGE_ONLY,REQUIRED,6/6 structural canary; raw UTF-16 story.contents path
+text.storyParagraphCount,text,COVERAGE_ONLY,REQUIRED,Paragraph insertion/deletion collateral detector
+paragraph.appliedParagraphStyle,paragraph,RECONSTRUCTIVE,REQUIRED,Exact style identity
+paragraph.overrideState,paragraph,COVERAGE_ONLY,REQUIRED,Live override-state result
+paragraph.alignToBaseline,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.appliedNumberingList,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.autoLeading,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.balanceRaggedLines,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.bulletsAlignment,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.bulletsAndNumberingListType,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.bulletsCharacterStyle,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.bulletsTextAfter,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.bunriKinshi,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.characterDirection,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.cjkGridTracking,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.composer,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.desiredGlyphScaling,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.desiredLetterSpacing,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.desiredWordSpacing,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.dropCapCharacters,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.dropCapLines,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.dropCapStyle,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.dropcapDetail,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.firstLineIndent,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.gridAlignFirstLineOnly,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.gridAlignment,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.gridGyoudori,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.hyphenWeight,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.hyphenateAfterFirst,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.hyphenateBeforeLast,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.hyphenateCapitalizedWords,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.hyphenateLadderLimit,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.hyphenateLastWord,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.hyphenateWordsLongerThan,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.hyphenation,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.hyphenationZone,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.jidori,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.justification,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.kashidas,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.keepAllLinesTogether,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.keepFirstLines,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.keepLastLines,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.keepLinesTogether,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.keepWithNext,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.keepWithPrevious,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.kinsokuHangType,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.kinsokuSet,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.kinsokuType,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.lastLineIndent,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.leadingModel,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.leftIndent,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.maximumGlyphScaling,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.maximumLetterSpacing,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.maximumWordSpacing,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.mergeConsecutiveParaBorders,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.minimumGlyphScaling,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.minimumLetterSpacing,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.minimumWordSpacing,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.mojikumi,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.numberingAlignment,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.numberingApplyRestartPolicy,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.numberingCharacterStyle,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.numberingContinue,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.numberingExpression,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.numberingFormat,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.numberingLevel,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.numberingStartAt,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderBottomLeftCornerOption,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderBottomLeftCornerRadius,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderBottomLineWeight,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderBottomOffset,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderBottomOrigin,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderBottomRightCornerOption,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderBottomRightCornerRadius,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderColor,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderDisplayIfSplits,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderGapColor,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderGapOverprint,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderGapTint,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderLeftLineWeight,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderLeftOffset,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderOn,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderOverprint,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderRightLineWeight,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderRightOffset,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderStrokeEndCap,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderStrokeEndJoin,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderTint,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderTopLeftCornerOption,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderTopLeftCornerRadius,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderTopLineWeight,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderTopOffset,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderTopOrigin,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderTopRightCornerOption,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderTopRightCornerRadius,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderType,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphBorderWidth,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphDirection,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphGyoudori,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphKashidaWidth,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingBottomLeftCornerOption,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingBottomLeftCornerRadius,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingBottomOffset,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingBottomOrigin,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingBottomRightCornerOption,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingBottomRightCornerRadius,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingClipToFrame,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingColor,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingLeftOffset,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingOn,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingOverprint,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingRightOffset,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingSuppressPrinting,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingTint,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingTopLeftCornerOption,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingTopLeftCornerRadius,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingTopOffset,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingTopOrigin,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingTopRightCornerOption,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingTopRightCornerRadius,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.paragraphShadingWidth,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rightIndent,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyAlignment,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyAutoAlign,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyAutoScaling,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyAutoTcyAutoScale,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyAutoTcyDigits,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyAutoTcyIncludeRoman,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyFill,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyFont,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyFontSize,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyFontStyle,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyOpenTypePro,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyOverhang,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyOverprintFill,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyOverprintStroke,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyParentOverhangAmount,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyParentScalingPercent,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyParentSpacing,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyPosition,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyStroke,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyStrokeTint,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyTint,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyType,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyWeight,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyXOffset,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyXScale,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyYOffset,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.rubyYScale,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleAbove,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleAboveColor,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleAboveLeftIndent,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleAboveLineWeight,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleAboveOffset,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleAboveRightIndent,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleAboveTint,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleAboveWidth,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleBelow,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleBelowColor,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleBelowLeftIndent,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleBelowLineWeight,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleBelowOffset,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleBelowRightIndent,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleBelowTint,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.ruleBelowWidth,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.sameParaStyleSpacing,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.singleWordJustification,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.spaceAfter,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.spaceBefore,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.spanColumnMinSpaceAfter,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.spanColumnMinSpaceBefore,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.spanColumnType,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.spanSplitColumnCount,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.splitColumnInsideGutter,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.splitColumnOutsideGutter,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.startParagraph,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.tabList,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.warichu,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.warichuAlignment,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.warichuCharsAfterBreak,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.warichuCharsBeforeBreak,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.warichuLineSpacing,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.warichuLines,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+paragraph.warichuSize,paragraph,RECONSTRUCTIVE,REQUIRED,180-property empirical census + serialized reconstruction
+characters.appliedCharacterStyle,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.appliedFont,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.fontStyle,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.pointSize,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.leading,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.tracking,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.kerningMethod,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.kerningValue,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges; read-derived Mutate.NOT_APPLICABLE where absent
+characters.baselineShift,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.horizontalScale,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.verticalScale,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.skew,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.fillColor,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.fillTint,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.strokeColor,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.strokeTint,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.strokeWeight,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.underline,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.strikeThru,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.capitalization,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.position,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.noBreak,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.ligatures,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.appliedLanguage,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfContextualAlternate,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfDiscretionaryLigature,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfFraction,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfHVKana,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfHistorical,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfJustificationAlternate,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfLocale,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfMark,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfOrdinal,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfOverlapSwash,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfProportionalMetrics,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfRomanItalics,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfSlashedZero,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfStretchedAlternate,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfStylisticAlternate,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfSwash,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfTitling,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfFigureStyle,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.otfStylisticSets,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.underlineColor,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.underlineTint,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.underlineWeight,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.underlineOffset,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.underlineType,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.strikeThroughColor,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.strikeThroughTint,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.strikeThroughWeight,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.strikeThroughOffset,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+characters.strikeThroughType,character,RECONSTRUCTIVE,REQUIRED,53/53 live equivalence; position-mapped textStyleRanges
+red.positionSignature,character,DERIVED_FROM_RECONSTRUCTIVE,REQUIRED,Red-position preservation/verification signature
+composition.lineCount,composition,COVERAGE_ONLY,REQUIRED,4/4 fixture stability; 8 no-op recompositions each
+composition.lineBreakSignature,composition,COVERAGE_ONLY,REQUIRED,4/4 fixture stability; 8 no-op recompositions each
+composition.frameSpanSignature,composition,COVERAGE_ONLY,REQUIRED,4/4 fixture stability; 8 no-op recompositions each
+composition.oversetState,composition,COVERAGE_ONLY,REQUIRED,4/4 fixture stability; 8 no-op recompositions each

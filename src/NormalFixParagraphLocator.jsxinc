@@ -1,0 +1,378 @@
+/*
+ * NormalFix - paragraph locator
+ * Copyright (C) 2026 John Darby
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Provenance:
+ *   Extracted unchanged from NormalFix_ReadOnly_Manuscript_Sweep_v1_1.jsx.
+ *   Proven locator version: 0.2.0
+ *   Extracted locator logic SHA-256: 6b6c4724885ba37cabad9720e660b06aeaddd871de9f49c113b663b62ec48b8c
+ *
+ * This is NormalFix tool-specific source. It consumes suite contracts but is
+ * not a copy of shared core.
+ */
+
+var NormalFixParagraphLocator = (function () {
+    var VERSION = "0.2.0";
+    var KIND = "NormalFixParagraph";
+    var LOCATOR_VERSION = 1;
+    var BOF = "@NORMALFIX_BOF";
+    var EOF = "@NORMALFIX_EOF";
+
+    function valid(obj) {
+        if (obj === null || obj === undefined) {
+            return false;
+        }
+        try {
+            if (obj.isValid === false) {
+                return false;
+            }
+        } catch (eValid) {}
+        return true;
+    }
+
+    function hex32(value) {
+        var s = (value >>> 0).toString(16);
+        while (s.length < 8) {
+            s = "0" + s;
+        }
+        return s;
+    }
+
+    function fnv1a32(text) {
+        var hash = 2166136261;
+        var i, c;
+
+        for (i = 0; i < text.length; i++) {
+            c = text.charCodeAt(i);
+            hash ^= c;
+            hash = (hash +
+                    (hash << 1) +
+                    (hash << 4) +
+                    (hash << 7) +
+                    (hash << 8) +
+                    (hash << 24)) | 0;
+        }
+
+        return hex32(hash);
+    }
+
+    function djb2xor32(text) {
+        var hash = 5381;
+        var i;
+
+        for (i = 0; i < text.length; i++) {
+            hash = (((hash << 5) + hash) ^ text.charCodeAt(i)) | 0;
+        }
+
+        return hex32(hash);
+    }
+
+    function safeContents(textObject) {
+        try {
+            return String(textObject.contents);
+        } catch (eContents) {
+            return "";
+        }
+    }
+
+    function textFingerprint(text) {
+        text = String(text);
+        return "L" + text.length +
+               "-F" + fnv1a32(text) +
+               "-D" + djb2xor32(text);
+    }
+
+    function paragraphFingerprint(para) {
+        return textFingerprint(safeContents(para));
+    }
+
+    function paragraphOrdinal(story, para) {
+        var targetTextIndex = null;
+        var i, candidate, candidateTextIndex;
+
+        if (!valid(story) || !valid(para)) {
+            return -1;
+        }
+
+        // Paragraph.index is a text-position index in the story, not the
+        // ordinal in story.paragraphs. Use it only to identify the same
+        // paragraph while scanning the paragraph collection.
+        try {
+            targetTextIndex = Number(para.index);
+        } catch (eTargetIndex) {
+            targetTextIndex = null;
+        }
+
+        for (i = 0; i < story.paragraphs.length; i++) {
+            try {
+                candidate = story.paragraphs.item(i);
+                if (!valid(candidate)) {
+                    continue;
+                }
+
+                if (targetTextIndex !== null) {
+                    candidateTextIndex = Number(candidate.index);
+                    if (candidateTextIndex === targetTextIndex) {
+                        return i;
+                    }
+                }
+            } catch (eCandidate) {}
+        }
+
+        return -1;
+    }
+
+    function textIndexHint(para) {
+        try {
+            return Number(para.index);
+        } catch (eIndex) {
+            return -1;
+        }
+    }
+
+    function neighborFingerprint(story, index, direction) {
+        var neighborIndex = index + direction;
+
+        if (neighborIndex < 0) {
+            return BOF;
+        }
+
+        try {
+            if (neighborIndex >= story.paragraphs.length) {
+                return EOF;
+            }
+            return paragraphFingerprint(story.paragraphs.item(neighborIndex));
+        } catch (eNeighbor) {
+            return direction < 0 ? BOF : EOF;
+        }
+    }
+
+    function capture(doc, para) {
+        var story;
+        var index;
+
+        if (!valid(doc)) {
+            throw new Error("NormalFix locator capture requires a valid document.");
+        }
+        if (!valid(para)) {
+            throw new Error("NormalFix locator capture requires a valid paragraph.");
+        }
+
+        try {
+            story = para.parentStory;
+        } catch (eStory) {
+            story = null;
+        }
+
+        if (!valid(story)) {
+            throw new Error("NormalFix locator could not resolve the paragraph story.");
+        }
+
+        index = paragraphOrdinal(story, para);
+        if (index < 0) {
+            throw new Error("NormalFix locator could not derive the paragraph ordinal.");
+        }
+
+        return {
+            kind: KIND,
+            version: LOCATOR_VERSION,
+            documentId: Number(doc.id),
+            storyId: Number(story.id),
+            contentFingerprint: paragraphFingerprint(para),
+            previousFingerprint: neighborFingerprint(story, index, -1),
+            nextFingerprint: neighborFingerprint(story, index, 1),
+            paragraphOrdinalHint: index,
+            textIndexHint: textIndexHint(para)
+        };
+    }
+
+    function resolveStory(doc, locator) {
+        var story = null;
+
+        if (!valid(doc)) {
+            return null;
+        }
+
+        try {
+            if (Number(doc.id) !== Number(locator.documentId)) {
+                return null;
+            }
+        } catch (eDocId) {
+            return null;
+        }
+
+        try {
+            story = doc.stories.itemByID(Number(locator.storyId));
+        } catch (eStoryById) {
+            story = null;
+        }
+
+        if (!valid(story)) {
+            return null;
+        }
+
+        try {
+            if (Number(story.id) !== Number(locator.storyId)) {
+                return null;
+            }
+        } catch (eStoryId) {
+            return null;
+        }
+
+        return story;
+    }
+
+    function candidateContextMatches(story, index, locator) {
+        return neighborFingerprint(story, index, -1) === locator.previousFingerprint &&
+               neighborFingerprint(story, index, 1) === locator.nextFingerprint;
+    }
+
+    function locatorShapeValid(locator) {
+        return locator !== null &&
+               locator !== undefined &&
+               locator.kind === KIND &&
+               Number(locator.version) === LOCATOR_VERSION &&
+               locator.documentId !== undefined &&
+               locator.storyId !== undefined &&
+               locator.paragraphOrdinalHint !== undefined &&
+               typeof locator.contentFingerprint === "string" &&
+               typeof locator.previousFingerprint === "string" &&
+               typeof locator.nextFingerprint === "string";
+    }
+
+    function result(target, reason, method, candidateCount, index) {
+        return {
+            target: target,
+            reason: reason,
+            method: method,
+            candidateCount: candidateCount,
+            resolvedIndex: index
+        };
+    }
+
+    function resolveDetailed(doc, locator) {
+        var story;
+        var hint;
+        var hintPara;
+        var i, para;
+        var contentCandidates = [];
+        var contextCandidates = [];
+
+        if (!locatorShapeValid(locator)) {
+            return result(null, "LOCATOR_INVALID", "NONE", 0, -1);
+        }
+
+        story = resolveStory(doc, locator);
+        if (story === null) {
+            return result(null, "CONTAINER_NOT_RESOLVED", "NONE", 0, -1);
+        }
+
+        // Fast path. The hint is accepted only when both target content and
+        // context fingerprints still match. The ordinal itself is never proof.
+        hint = Number(locator.paragraphOrdinalHint);
+        if (!isNaN(hint) && hint >= 0) {
+            try {
+                if (hint < story.paragraphs.length) {
+                    hintPara = story.paragraphs.item(hint);
+                    if (valid(hintPara) &&
+                        paragraphFingerprint(hintPara) === locator.contentFingerprint &&
+                        candidateContextMatches(story, hint, locator)) {
+                        return result(hintPara, "", "HINT_WITH_FULL_FINGERPRINT", 1, hint);
+                    }
+                }
+            } catch (eHint) {}
+        }
+
+        // Primary scan: exact target text fingerprint inside the exact story.
+        for (i = 0; i < story.paragraphs.length; i++) {
+            try {
+                para = story.paragraphs.item(i);
+                if (valid(para) &&
+                    paragraphFingerprint(para) === locator.contentFingerprint) {
+                    contentCandidates.push({paragraph: para, index: i});
+                }
+            } catch (eCandidate) {}
+        }
+
+        if (contentCandidates.length === 0) {
+            return result(null, "CONTENT_NOT_FOUND", "SCAN", 0, -1);
+        }
+
+        // Unique text is sufficient once the document and story IDs match.
+        if (contentCandidates.length === 1) {
+            return result(
+                contentCandidates[0].paragraph,
+                "",
+                "CONTENT_UNIQUE",
+                1,
+                contentCandidates[0].index
+            );
+        }
+
+        // Duplicate text requires exact two-sided immediate context.
+        for (i = 0; i < contentCandidates.length; i++) {
+            if (candidateContextMatches(
+                    story,
+                    contentCandidates[i].index,
+                    locator)) {
+                contextCandidates.push(contentCandidates[i]);
+            }
+        }
+
+        if (contextCandidates.length === 1) {
+            return result(
+                contextCandidates[0].paragraph,
+                "",
+                "CONTEXT_UNIQUE",
+                contentCandidates.length,
+                contextCandidates[0].index
+            );
+        }
+
+        return result(
+            null,
+            contextCandidates.length === 0 ?
+                "DUPLICATE_CONTENT_CONTEXT_NOT_FOUND" :
+                "AMBIGUOUS_DUPLICATE_CONTENT",
+            "SCAN",
+            contentCandidates.length,
+            -1
+        );
+    }
+
+    function resolve(doc, locator) {
+        return resolveDetailed(doc, locator).target;
+    }
+
+    function compareLocators(a, b) {
+        var fields = ["documentId", "storyId", "paragraphOrdinalHint", "textIndexHint",
+                      "contentFingerprint", "previousFingerprint", "nextFingerprint"];
+        var i, av, bv;
+
+        for (i = 0; i < fields.length; i++) {
+            av = String(a[fields[i]]);
+            bv = String(b[fields[i]]);
+            if (av < bv) {
+                return -1;
+            }
+            if (av > bv) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    return {
+        VERSION: VERSION,
+        KIND: KIND,
+        capture: capture,
+        resolve: resolve,
+        resolveDetailed: resolveDetailed,
+        compareLocators: compareLocators,
+        paragraphFingerprint: paragraphFingerprint,
+        paragraphOrdinal: paragraphOrdinal,
+        textFingerprint: textFingerprint
+    };
+}());

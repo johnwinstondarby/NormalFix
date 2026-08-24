@@ -1,0 +1,118 @@
+/*
+ * NormalFix - sentinel normalization for rollback/digest state
+ * Copyright (C) 2026 John Darby
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+/*
+NormalFix sentinel normalizer v0.1.0-dev1
+Identity contract candidate: 0.3.0
+ExtendScript / ECMAScript 3 compatible.
+
+Purpose:
+  Normalize legitimate NothingEnum.NOTHING values for the two frozen
+  reconstructive paragraph keys that admit that sentinel before any value
+  is offered to CoreIdentity.serialize().
+
+Required load order:
+  CoreMutate.jsxinc
+  NormalFixSentinelNormalizer.jsxinc
+
+This module deliberately does not call CoreIdentity. The caller performs
+identity serialization only after normalization.
+*/
+
+var NormalFixSentinelNormalizer = (function () {
+    var VERSION = "0.1.0-dev1";
+    var CONTRACT_VERSION = "0.3.0";
+
+    var KEY_KINSOKU_SET = "paragraph.kinsokuSet";
+    var KEY_MOJIKUMI = "paragraph.mojikumi";
+
+    function safeString(value) {
+        try { return String(value); }
+        catch (e) { return ""; }
+    }
+
+    function typeName(value) {
+        var out = "";
+        try {
+            if (value && value.reflect && value.reflect.name) {
+                out = String(value.reflect.name);
+                if (out.length > 0) { return out; }
+            }
+        } catch (eReflect) {}
+        try {
+            if (value && typeof value.constructorName !== "undefined") {
+                out = String(value.constructorName);
+                if (out.length > 0) { return out; }
+            }
+        } catch (eConstructor) {}
+        return out;
+    }
+
+    function isNothingEnumNothing(value) {
+        var expectedNumber;
+        var actualNumber;
+
+        if (typeName(value) !== "Enumerator") {
+            return false;
+        }
+
+        if (safeString(value) !== "NOTHING") {
+            return false;
+        }
+
+        try {
+            expectedNumber = Number(NothingEnum.NOTHING);
+            actualNumber = Number(value);
+        } catch (eNumber) {
+            return false;
+        }
+
+        if (isNaN(expectedNumber) || isNaN(actualNumber)) {
+            return false;
+        }
+
+        return actualNumber === expectedNumber;
+    }
+
+    function isSentinelCapableKey(key) {
+        key = String(key || "");
+        return key === KEY_KINSOKU_SET || key === KEY_MOJIKUMI;
+    }
+
+    function requireCoreMutate() {
+        if (typeof CoreMutate === "undefined" ||
+            !CoreMutate ||
+            !CoreMutate.NOT_APPLICABLE) {
+            throw new Error(
+                "NormalFixSentinelNormalizer requires CoreMutate.NOT_APPLICABLE."
+            );
+        }
+    }
+
+    function normalize(key, rawValue) {
+        if (!isSentinelCapableKey(key)) {
+            return rawValue;
+        }
+
+        if (!isNothingEnumNothing(rawValue)) {
+            return rawValue;
+        }
+
+        requireCoreMutate();
+        return CoreMutate.NOT_APPLICABLE;
+    }
+
+    return {
+        VERSION: VERSION,
+        CONTRACT_VERSION: CONTRACT_VERSION,
+        KEY_KINSOKU_SET: KEY_KINSOKU_SET,
+        KEY_MOJIKUMI: KEY_MOJIKUMI,
+        isNothingEnumNothing: isNothingEnumNothing,
+        isSentinelCapableKey: isSentinelCapableKey,
+        normalize: normalize
+    };
+}());

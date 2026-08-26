@@ -1,0 +1,527 @@
+﻿/*
+ * NormalFix - registry-to-identity coverage contract
+ * Copyright (C) 2026 John Darby
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+/*
+NormalFix identity coverage v0.1.0-dev1
+Identity contract candidate: 0.3.0
+ExtendScript / ECMAScript 3 compatible.
+
+Purpose:
+  Mechanically verify that every empirically established host-object-capable
+  NormalFix digest key has an explicit CoreIdentity family binding and that
+  legitimate sentinel-capable keys have a corresponding normalization rule.
+
+Required load order:
+  CoreIdentity.jsxinc
+  NormalFixSentinelNormalizer.jsxinc
+  NormalFixIdentityCoverage.jsxinc
+
+The frozen digest registry remains the independent authority for digest keys.
+This module does not infer host-object capability from property names.
+*/
+
+var NormalFixIdentityCoverage = (function () {
+    var VERSION = "0.1.0-dev1";
+    var CONTRACT_VERSION = "0.3.0";
+    var ERROR_CODE = "ADAPTER_CONTRACT_MISMATCH";
+
+    var FROZEN_REGISTRY_KEY_COUNT = 243;
+    var HOST_OBJECT_KEY_COUNT = 25;
+
+    /*
+     * Empirical host-object surface established by the NormalFix reconstruction,
+     * discrimination, international, character, and production-manuscript
+     * runtime probes.
+     */
+    var HOST_OBJECT_KEYS = [
+        "paragraph.appliedParagraphStyle",
+        "paragraph.appliedNumberingList",
+        "paragraph.bulletsCharacterStyle",
+        "paragraph.dropCapStyle",
+        "paragraph.kinsokuSet",
+        "paragraph.mojikumi",
+        "paragraph.numberingCharacterStyle",
+        "paragraph.paragraphBorderColor",
+        "paragraph.paragraphBorderGapColor",
+        "paragraph.paragraphBorderType",
+        "paragraph.paragraphShadingColor",
+        "paragraph.rubyFill",
+        "paragraph.rubyFont",
+        "paragraph.rubyStroke",
+        "paragraph.ruleAboveColor",
+        "paragraph.ruleBelowColor",
+        "characters.appliedCharacterStyle",
+        "characters.appliedFont",
+        "characters.fillColor",
+        "characters.strokeColor",
+        "characters.appliedLanguage",
+        "characters.underlineColor",
+        "characters.underlineType",
+        "characters.strikeThroughColor",
+        "characters.strikeThroughType"
+    ];
+
+    function requireDependencies() {
+        if (typeof CoreIdentity === "undefined" || !CoreIdentity) {
+            throw new Error(
+                "NormalFixIdentityCoverage requires CoreIdentity."
+            );
+        }
+
+        if (typeof NormalFixSentinelNormalizer === "undefined" ||
+            !NormalFixSentinelNormalizer) {
+            throw new Error(
+                "NormalFixIdentityCoverage requires NormalFixSentinelNormalizer."
+            );
+        }
+    }
+
+    function identityBindings() {
+        requireDependencies();
+
+        return [
+            {
+                key: "paragraph.appliedParagraphStyle",
+                families: [CoreIdentity.FAMILY_PARAGRAPH_STYLE],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.appliedNumberingList",
+                families: [CoreIdentity.FAMILY_NUMBERING_LIST],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.bulletsCharacterStyle",
+                families: [CoreIdentity.FAMILY_CHARACTER_STYLE],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.dropCapStyle",
+                families: [CoreIdentity.FAMILY_CHARACTER_STYLE],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.kinsokuSet",
+                families: [CoreIdentity.FAMILY_KINSOKU_TABLE],
+                sentinel: "NOTHING"
+            },
+            {
+                key: "paragraph.mojikumi",
+                families: [CoreIdentity.FAMILY_MOJIKUMI_TABLE],
+                sentinel: "NOTHING"
+            },
+            {
+                key: "paragraph.numberingCharacterStyle",
+                families: [CoreIdentity.FAMILY_CHARACTER_STYLE],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.paragraphBorderColor",
+                families: [
+                    CoreIdentity.FAMILY_NAMED_SWATCH_COLOR,
+                    CoreIdentity.FAMILY_ANONYMOUS_COLOR
+                ],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.paragraphBorderGapColor",
+                families: [
+                    CoreIdentity.FAMILY_NAMED_SWATCH_COLOR,
+                    CoreIdentity.FAMILY_ANONYMOUS_COLOR
+                ],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.paragraphBorderType",
+                families: [CoreIdentity.FAMILY_STROKE_STYLE],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.paragraphShadingColor",
+                families: [
+                    CoreIdentity.FAMILY_NAMED_SWATCH_COLOR,
+                    CoreIdentity.FAMILY_ANONYMOUS_COLOR
+                ],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.rubyFill",
+                families: [
+                    CoreIdentity.FAMILY_NAMED_SWATCH_COLOR,
+                    CoreIdentity.FAMILY_ANONYMOUS_COLOR
+                ],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.rubyFont",
+                families: [CoreIdentity.FAMILY_FONT],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.rubyStroke",
+                families: [
+                    CoreIdentity.FAMILY_NAMED_SWATCH_COLOR,
+                    CoreIdentity.FAMILY_ANONYMOUS_COLOR
+                ],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.ruleAboveColor",
+                families: [
+                    CoreIdentity.FAMILY_NAMED_SWATCH_COLOR,
+                    CoreIdentity.FAMILY_ANONYMOUS_COLOR
+                ],
+                sentinel: "NONE"
+            },
+            {
+                key: "paragraph.ruleBelowColor",
+                families: [
+                    CoreIdentity.FAMILY_NAMED_SWATCH_COLOR,
+                    CoreIdentity.FAMILY_ANONYMOUS_COLOR
+                ],
+                sentinel: "NONE"
+            },
+            {
+                key: "characters.appliedCharacterStyle",
+                families: [CoreIdentity.FAMILY_CHARACTER_STYLE],
+                sentinel: "NONE"
+            },
+            {
+                key: "characters.appliedFont",
+                families: [CoreIdentity.FAMILY_FONT],
+                sentinel: "NONE"
+            },
+            {
+                key: "characters.fillColor",
+                families: [
+                    CoreIdentity.FAMILY_NAMED_SWATCH_COLOR,
+                    CoreIdentity.FAMILY_ANONYMOUS_COLOR
+                ],
+                sentinel: "NONE"
+            },
+            {
+                key: "characters.strokeColor",
+                families: [
+                    CoreIdentity.FAMILY_NAMED_SWATCH_COLOR,
+                    CoreIdentity.FAMILY_ANONYMOUS_COLOR
+                ],
+                sentinel: "NONE"
+            },
+            {
+                key: "characters.appliedLanguage",
+                families: [CoreIdentity.FAMILY_LANGUAGE],
+                sentinel: "NONE"
+            },
+            {
+                key: "characters.underlineColor",
+                families: [
+                    CoreIdentity.FAMILY_NAMED_SWATCH_COLOR,
+                    CoreIdentity.FAMILY_ANONYMOUS_COLOR
+                ],
+                sentinel: "NONE"
+            },
+            {
+                key: "characters.underlineType",
+                families: [CoreIdentity.FAMILY_STROKE_STYLE],
+                sentinel: "NONE"
+            },
+            {
+                key: "characters.strikeThroughColor",
+                families: [
+                    CoreIdentity.FAMILY_NAMED_SWATCH_COLOR,
+                    CoreIdentity.FAMILY_ANONYMOUS_COLOR
+                ],
+                sentinel: "NONE"
+            },
+            {
+                key: "characters.strikeThroughType",
+                families: [CoreIdentity.FAMILY_STROKE_STYLE],
+                sentinel: "NONE"
+            }
+        ];
+    }
+
+    function copyArray(values) {
+        var out = [];
+        var i;
+
+        for (i = 0; i < values.length; i++) {
+            out.push(values[i]);
+        }
+
+        return out;
+    }
+
+    function allowedFamilyMap() {
+        var out = {};
+
+        out[CoreIdentity.FAMILY_LANGUAGE] = true;
+        out[CoreIdentity.FAMILY_CHARACTER_STYLE] = true;
+        out[CoreIdentity.FAMILY_PARAGRAPH_STYLE] = true;
+        out[CoreIdentity.FAMILY_NAMED_SWATCH_COLOR] = true;
+        out[CoreIdentity.FAMILY_FONT] = true;
+        out[CoreIdentity.FAMILY_STROKE_STYLE] = true;
+        out[CoreIdentity.FAMILY_NUMBERING_LIST] = true;
+        out[CoreIdentity.FAMILY_KINSOKU_TABLE] = true;
+        out[CoreIdentity.FAMILY_MOJIKUMI_TABLE] = true;
+        out[CoreIdentity.FAMILY_ANONYMOUS_COLOR] = true;
+
+        return out;
+    }
+
+    function addError(errors, text) {
+        errors.push(String(text));
+    }
+
+    function validate(registryRows) {
+        var errors = [];
+        var registryByKey = {};
+        var hostKeyMap = {};
+        var bindingByKey = {};
+        var bindings;
+        var allowedFamilies;
+        var i, j, row, key, binding, family;
+        var sentinelExpected;
+
+        requireDependencies();
+
+        if (CoreIdentity.CONTRACT_VERSION !== CONTRACT_VERSION) {
+            addError(
+                errors,
+                "CoreIdentity contract version is " +
+                CoreIdentity.CONTRACT_VERSION +
+                "; expected " +
+                CONTRACT_VERSION +
+                "."
+            );
+        }
+
+        if (NormalFixSentinelNormalizer.CONTRACT_VERSION !== CONTRACT_VERSION) {
+            addError(
+                errors,
+                "NormalFixSentinelNormalizer contract version is " +
+                NormalFixSentinelNormalizer.CONTRACT_VERSION +
+                "; expected " +
+                CONTRACT_VERSION +
+                "."
+            );
+        }
+
+        if (!(registryRows instanceof Array)) {
+            addError(errors, "Frozen digest registry rows were not supplied as an Array.");
+
+            return {
+                ok: false,
+                code: ERROR_CODE,
+                errors: errors,
+                registryKeys: 0,
+                hostObjectKeys: HOST_OBJECT_KEYS.length,
+                bindings: 0
+            };
+        }
+
+        if (registryRows.length !== FROZEN_REGISTRY_KEY_COUNT) {
+            addError(
+                errors,
+                "Frozen digest registry key count is " +
+                registryRows.length +
+                "; expected " +
+                FROZEN_REGISTRY_KEY_COUNT +
+                "."
+            );
+        }
+
+        for (i = 0; i < registryRows.length; i++) {
+            row = registryRows[i] || {};
+            key = String(row.Key || "");
+
+            if (key.length === 0) {
+                addError(errors, "Frozen digest registry contains an empty Key.");
+                continue;
+            }
+
+            if (registryByKey[key]) {
+                addError(errors, "Frozen digest registry contains duplicate key: " + key);
+                continue;
+            }
+
+            registryByKey[key] = row;
+        }
+
+        if (HOST_OBJECT_KEYS.length !== HOST_OBJECT_KEY_COUNT) {
+            addError(
+                errors,
+                "Host-object key declaration count is " +
+                HOST_OBJECT_KEYS.length +
+                "; expected " +
+                HOST_OBJECT_KEY_COUNT +
+                "."
+            );
+        }
+
+        for (i = 0; i < HOST_OBJECT_KEYS.length; i++) {
+            key = HOST_OBJECT_KEYS[i];
+
+            if (hostKeyMap[key]) {
+                addError(errors, "Duplicate host-object key declaration: " + key);
+                continue;
+            }
+
+            hostKeyMap[key] = true;
+
+            if (!registryByKey[key]) {
+                addError(errors, "Host-object key is absent from frozen registry: " + key);
+            } else {
+                if (String(registryByKey[key]["Snapshot Role"] || "") !==
+                    "RECONSTRUCTIVE") {
+                    addError(
+                        errors,
+                        "Host-object key is not RECONSTRUCTIVE in frozen registry: " +
+                        key
+                    );
+                }
+
+                if (String(registryByKey[key]["Digest Role"] || "") !==
+                    "REQUIRED") {
+                    addError(
+                        errors,
+                        "Host-object key is not REQUIRED in frozen registry: " +
+                        key
+                    );
+                }
+            }
+        }
+
+        bindings = identityBindings();
+        allowedFamilies = allowedFamilyMap();
+
+        if (bindings.length !== HOST_OBJECT_KEY_COUNT) {
+            addError(
+                errors,
+                "Identity binding count is " +
+                bindings.length +
+                "; expected " +
+                HOST_OBJECT_KEY_COUNT +
+                "."
+            );
+        }
+
+        for (i = 0; i < bindings.length; i++) {
+            binding = bindings[i];
+            key = String(binding.key || "");
+
+            if (bindingByKey[key]) {
+                addError(errors, "Duplicate identity binding: " + key);
+                continue;
+            }
+
+            bindingByKey[key] = binding;
+
+            if (!hostKeyMap[key]) {
+                addError(
+                    errors,
+                    "Identity binding has no host-object key declaration: " +
+                    key
+                );
+            }
+
+            if (!(binding.families instanceof Array) ||
+                binding.families.length === 0) {
+                addError(errors, "Identity binding has no family: " + key);
+            } else {
+                for (j = 0; j < binding.families.length; j++) {
+                    family = binding.families[j];
+
+                    if (!allowedFamilies[family]) {
+                        addError(
+                            errors,
+                            "Identity binding uses unsupported CoreIdentity family " +
+                            family +
+                            " for " +
+                            key
+                        );
+                    }
+                }
+            }
+
+            sentinelExpected =
+                NormalFixSentinelNormalizer.isSentinelCapableKey(key);
+
+            if (binding.sentinel === "NOTHING") {
+                if (!sentinelExpected) {
+                    addError(
+                        errors,
+                        "Binding declares NOTHING but normalizer does not: " +
+                        key
+                    );
+                }
+            } else if (binding.sentinel === "NONE") {
+                if (sentinelExpected) {
+                    addError(
+                        errors,
+                        "Normalizer admits NOTHING but binding does not: " +
+                        key
+                    );
+                }
+            } else {
+                addError(
+                    errors,
+                    "Unknown sentinel declaration for " +
+                    key +
+                    ": " +
+                    binding.sentinel
+                );
+            }
+        }
+
+        for (i = 0; i < HOST_OBJECT_KEYS.length; i++) {
+            key = HOST_OBJECT_KEYS[i];
+
+            if (!bindingByKey[key]) {
+                addError(errors, "Host-object key has no identity binding: " + key);
+            }
+        }
+
+        if (!hostKeyMap[NormalFixSentinelNormalizer.KEY_KINSOKU_SET]) {
+            addError(
+                errors,
+                "Sentinel normalizer key is absent from host-object surface: " +
+                NormalFixSentinelNormalizer.KEY_KINSOKU_SET
+            );
+        }
+
+        if (!hostKeyMap[NormalFixSentinelNormalizer.KEY_MOJIKUMI]) {
+            addError(
+                errors,
+                "Sentinel normalizer key is absent from host-object surface: " +
+                NormalFixSentinelNormalizer.KEY_MOJIKUMI
+            );
+        }
+
+        return {
+            ok: errors.length === 0,
+            code: errors.length === 0 ? "" : ERROR_CODE,
+            errors: errors,
+            registryKeys: registryRows.length,
+            hostObjectKeys: HOST_OBJECT_KEYS.length,
+            bindings: bindings.length
+        };
+    }
+
+    return {
+        VERSION: VERSION,
+        CONTRACT_VERSION: CONTRACT_VERSION,
+        ERROR_CODE: ERROR_CODE,
+        FROZEN_REGISTRY_KEY_COUNT: FROZEN_REGISTRY_KEY_COUNT,
+        HOST_OBJECT_KEY_COUNT: HOST_OBJECT_KEY_COUNT,
+        hostObjectKeys: function () {
+            return copyArray(HOST_OBJECT_KEYS);
+        },
+        identityBindings: identityBindings,
+        validate: validate
+    };
+}());

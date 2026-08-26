@@ -11,8 +11,8 @@
 var NormalFixMutateAdapter = (function () {
     var VERSION = "0.1.0-dev3";
     var ADAPTER_ID = "NormalFix/core-mutate";
-    var LAST_CONFORMANCE_VERSION = "";
-    var LAST_CONFORMANCE_DATE = "";
+    var LAST_CONFORMANCE_VERSION = "0.1.0-dev3";
+    var LAST_CONFORMANCE_DATE = "2026-08-26";
 
     var STYLE_NAME = "Normal";
     var CLI_RED_BODY_STYLE = "CLI Code Red Body";

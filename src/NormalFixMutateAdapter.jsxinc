@@ -9,7 +9,7 @@
  */
 
 var NormalFixMutateAdapter = (function () {
-    var VERSION = "0.1.0-dev2";
+    var VERSION = "0.1.0-dev3";
     var ADAPTER_ID = "NormalFix/core-mutate";
     var LAST_CONFORMANCE_VERSION = "";
     var LAST_CONFORMANCE_DATE = "";
@@ -20,6 +20,259 @@ var NormalFixMutateAdapter = (function () {
     var SUPPORTED_APP_VERSION = "21.5.1.73";
     var SUPPORTED_DOM_VERSION = "21.5";
 
+    /*
+     * Enumerator reconstruction is property-bound because InDesign 21.5.1.73
+     * exposes Enumerator values without reliable owner identity through either
+     * Enumerator reflection, toSource(), or property ReflectionInfo.
+     *
+     * The 50 direct digest bindings below passed exact owner/member/number/text
+     * round-trip proof on the pinned host. paragraph.tabList is the nested
+     * TabStopAlignment binding proven by the Western reconstruction fixture.
+     */
+    var ENUM_OWNER_BY_KEY = {
+        "paragraph.balanceRaggedLines": "BalanceLinesStyle",
+        "paragraph.bulletsAlignment": "ListAlignment",
+        "paragraph.bulletsAndNumberingListType": "ListType",
+        "paragraph.characterDirection": "CharacterDirectionOptions",
+        "paragraph.gridAlignment": "GridAlignment",
+        "paragraph.justification": "Justification",
+        "paragraph.kashidas": "KashidasOptions",
+        "paragraph.kinsokuHangType": "KinsokuHangTypes",
+        "paragraph.kinsokuSet": "KinsokuSet",
+        "paragraph.kinsokuType": "KinsokuType",
+        "paragraph.leadingModel": "LeadingModel",
+        "paragraph.mojikumi": "MojikumiTableDefaults",
+        "paragraph.numberingAlignment": "ListAlignment",
+
+        "paragraph.paragraphBorderBottomLeftCornerOption": "CornerOptions",
+        "paragraph.paragraphBorderBottomOrigin": "ParagraphBorderBottomOriginEnum",
+        "paragraph.paragraphBorderBottomRightCornerOption": "CornerOptions",
+        "paragraph.paragraphBorderStrokeEndCap": "EndCap",
+        "paragraph.paragraphBorderStrokeEndJoin": "EndJoin",
+        "paragraph.paragraphBorderTopLeftCornerOption": "CornerOptions",
+        "paragraph.paragraphBorderTopOrigin": "ParagraphBorderTopOriginEnum",
+        "paragraph.paragraphBorderTopRightCornerOption": "CornerOptions",
+        "paragraph.paragraphBorderWidth": "ParagraphBorderEnum",
+
+        "paragraph.paragraphDirection": "ParagraphDirectionOptions",
+
+        "paragraph.paragraphShadingBottomLeftCornerOption": "CornerOptions",
+        "paragraph.paragraphShadingBottomOrigin": "ParagraphShadingBottomOriginEnum",
+        "paragraph.paragraphShadingBottomRightCornerOption": "CornerOptions",
+        "paragraph.paragraphShadingTopLeftCornerOption": "CornerOptions",
+        "paragraph.paragraphShadingTopOrigin": "ParagraphShadingTopOriginEnum",
+        "paragraph.paragraphShadingTopRightCornerOption": "CornerOptions",
+        "paragraph.paragraphShadingWidth": "ParagraphShadingWidthEnum",
+
+        "paragraph.rubyAlignment": "RubyAlignments",
+        "paragraph.rubyFontStyle": "NothingEnum",
+        "paragraph.rubyOverprintFill": "AdornmentOverprint",
+        "paragraph.rubyOverprintStroke": "AdornmentOverprint",
+        "paragraph.rubyParentOverhangAmount": "RubyOverhang",
+        "paragraph.rubyParentSpacing": "RubyParentSpacing",
+        "paragraph.rubyPosition": "RubyKentenPosition",
+        "paragraph.rubyType": "RubyTypes",
+
+        "paragraph.ruleAboveWidth": "RuleWidth",
+        "paragraph.ruleBelowWidth": "RuleWidth",
+        "paragraph.sameParaStyleSpacing": "Spacing",
+        "paragraph.singleWordJustification": "SingleWordJustification",
+        "paragraph.spanColumnType": "SpanColumnTypeOptions",
+        "paragraph.spanSplitColumnCount": "SpanColumnCountOptions",
+        "paragraph.startParagraph": "StartParagraph",
+        "paragraph.warichuAlignment": "WarichuAlignment",
+
+        "characters.leading": "Leading",
+        "characters.capitalization": "Capitalization",
+        "characters.position": "Position",
+        "characters.otfFigureStyle": "OTFFigureStyle",
+
+        "paragraph.tabList": "TabStopAlignment"
+    };
+
+    function enumOwnerForKey(key) {
+        var owner = "";
+
+        try {
+            owner = String(
+                ENUM_OWNER_BY_KEY[String(key)] || ""
+            );
+        } catch (eOwner) {
+            owner = "";
+        }
+
+        if (owner.length === 0) {
+            throw new Error(
+                "ADAPTER_CONTRACT_MISMATCH: no Enumerator owner binding for " +
+                key +
+                "."
+            );
+        }
+
+        return owner;
+    }
+
+    function validEnumeratorMemberName(value) {
+        return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(
+            String(value || "")
+        );
+    }
+
+    function resolveSerializedEnumerator(key, state) {
+        var registeredOwner;
+        var serializedOwner;
+        var member;
+        var number;
+        var ownerObject;
+        var value;
+
+        registeredOwner = enumOwnerForKey(key);
+        serializedOwner = String(state.owner || "");
+        member = String(state.member || "");
+
+        if (serializedOwner !== registeredOwner) {
+            throw new Error(
+                key +
+                " Enumerator owner mismatch: expected " +
+                registeredOwner +
+                ", observed " +
+                serializedOwner +
+                "."
+            );
+        }
+
+        if (!validEnumeratorMemberName(member)) {
+            throw new Error(
+                key +
+                " has invalid Enumerator member name."
+            );
+        }
+
+        if (member !== String(state.text || "")) {
+            throw new Error(
+                key +
+                " Enumerator member/text mismatch."
+            );
+        }
+
+        number = Number(state.number);
+
+        if (isNaN(number)) {
+            throw new Error(
+                key +
+                " has invalid Enumerator numeric state."
+            );
+        }
+
+        try {
+            /*
+             * registeredOwner comes only from the frozen table above.
+             * eval() is used because InDesign does not expose every enum owner
+             * through $.global reflection, while direct owner resolution is
+             * proven on the pinned host.
+             */
+            ownerObject = eval(registeredOwner);
+        } catch (eOwnerResolve) {
+            throw new Error(
+                key +
+                " could not resolve Enumerator owner " +
+                registeredOwner +
+                ": " +
+                eOwnerResolve.message
+            );
+        }
+
+        if (!ownerObject) {
+            throw new Error(
+                key +
+                " resolved an empty Enumerator owner " +
+                registeredOwner +
+                "."
+            );
+        }
+
+        try {
+            value = ownerObject[member];
+        } catch (eMemberResolve) {
+            throw new Error(
+                key +
+                " could not resolve Enumerator member " +
+                registeredOwner +
+                "." +
+                member +
+                ": " +
+                eMemberResolve.message
+            );
+        }
+
+        if (!isEnumerator(value)) {
+            throw new Error(
+                key +
+                " did not reconstruct an Enumerator from " +
+                registeredOwner +
+                "." +
+                member +
+                "."
+            );
+        }
+
+        if (Number(value) !== number) {
+            throw new Error(
+                key +
+                " Enumerator numeric identity mismatch for " +
+                registeredOwner +
+                "." +
+                member +
+                "."
+            );
+        }
+
+        if (String(value) !== String(state.text || "")) {
+            throw new Error(
+                key +
+                " Enumerator textual identity mismatch for " +
+                registeredOwner +
+                "." +
+                member +
+                "."
+            );
+        }
+
+        return value;
+    }
+
+    function serializedEnumeratorMatchesLive(key, state, liveValue) {
+        var registeredOwner;
+
+        if (!state ||
+            state.kind !== "enum" ||
+            !isEnumerator(liveValue)) {
+            return false;
+        }
+
+        registeredOwner = enumOwnerForKey(key);
+
+        if (String(state.owner || "") !== registeredOwner) {
+            return false;
+        }
+
+        if (String(state.member || "") !==
+            String(state.text || "")) {
+            return false;
+        }
+
+        if (String(liveValue) !==
+            String(state.member || "")) {
+            return false;
+        }
+
+        if (Number(liveValue) !==
+            Number(state.number)) {
+            return false;
+        }
+
+        return true;
+    }
     function valid(obj) {
         if (obj === null || obj === undefined) {
             return false;
@@ -260,6 +513,8 @@ var NormalFixMutateAdapter = (function () {
         var t = typeof value;
         var state;
         var result;
+        var owner;
+        var member;
         var items;
         var keys;
         var i;
@@ -289,14 +544,32 @@ var NormalFixMutateAdapter = (function () {
         }
 
         if (isEnumerator(value)) {
+            owner = enumOwnerForKey(key);
+            member = String(value);
             result = Number(value);
-            if (isNaN(result)) {
-                throw new Error(key + " enumerator has no numeric value.");
+
+            if (!validEnumeratorMemberName(member)) {
+                throw new Error(
+                    key +
+                    " Enumerator has invalid member name " +
+                    member +
+                    "."
+                );
             }
+
+            if (isNaN(result)) {
+                throw new Error(
+                    key +
+                    " Enumerator has no numeric value."
+                );
+            }
+
             return {
                 kind: "enum",
+                owner: owner,
+                member: member,
                 number: result,
-                text: String(value)
+                text: member
             };
         }
 
@@ -417,11 +690,10 @@ var NormalFixMutateAdapter = (function () {
         }
 
         if (state.kind === "enum") {
-            result = Number(state.number);
-            if (isNaN(result)) {
-                throw new Error(key + " has invalid enumerator state.");
-            }
-            return result;
+            return resolveSerializedEnumerator(
+                key,
+                state
+            );
         }
 
         if (state.kind === "host_identity") {
@@ -751,7 +1023,7 @@ var NormalFixMutateAdapter = (function () {
                 prop = paragraphProps[i];
 
                 try {
-                    if (prop === "tabList") {
+            if (prop === "tabList") {
                         snapshot.paragraphProperties[prop] =
                             encodeTabList(para, doc, bindings);
                     } else {
@@ -1160,6 +1432,36 @@ var NormalFixMutateAdapter = (function () {
                 );
             }
 
+            if (snapshot.paragraphProperties[prop].kind === "null") {
+                try {
+                    value = para[prop];
+                } catch (eNullRead) {
+                    throw new Error(
+                        "ROLLBACK_NULL_STATE_READ_FAILED: paragraph." +
+                        prop +
+                        " | " +
+                        eNullRead.message
+                    );
+                }
+
+                if (value === null) {
+                    continue;
+                }
+
+                throw new Error(
+                    "ROLLBACK_NULL_STATE_DIFFERS: paragraph." +
+                    prop +
+                    " | currentType=" +
+                    typeName(value) +
+                    " | typeof=" +
+                    (typeof value)
+                );
+            }
+
+            if (snapshot.paragraphProperties[prop].kind === "not_applicable") {
+                continue;
+            }
+
             if (prop === "tabList") {
                 value = decodeTabList(
                     snapshot.paragraphProperties[prop],
@@ -1175,7 +1477,44 @@ var NormalFixMutateAdapter = (function () {
                 );
             }
 
-            para[prop] = value;
+            if (snapshot.paragraphProperties[prop].kind === "enum") {
+                try {
+                    if (serializedEnumeratorMatchesLive(
+                            "paragraph." + prop,
+                            snapshot.paragraphProperties[prop],
+                            para[prop]
+                        )) {
+                        continue;
+                    }
+                } catch (eEnumRead) {
+                    throw new Error(
+                        "ROLLBACK_ENUM_STATE_READ_FAILED: paragraph." +
+                        prop +
+                        " | " +
+                        eEnumRead.message
+                    );
+                }
+            }
+            try {
+                para[prop] = value;
+            } catch (eParagraphAssign) {
+                throw new Error(
+                    "ROLLBACK_PARAGRAPH_ASSIGNMENT_FAILED: paragraph." +
+                    prop +
+                    " | serializedKind=" +
+                    String(
+                        snapshot.paragraphProperties[prop] &&
+                        snapshot.paragraphProperties[prop].kind ||
+                        ""
+                    ) +
+                    " | decodedType=" +
+                    typeName(value) +
+                    " | typeof=" +
+                    (typeof value) +
+                    " | hostError=" +
+                    eParagraphAssign.message
+                );
+            }
         }
 
         for (i = 0; i < snapshot.characterSegments.length; i++) {
@@ -1205,6 +1544,40 @@ var NormalFixMutateAdapter = (function () {
                     );
                 }
 
+                if (segment.properties[prop].kind === "null") {
+                    try {
+                        value = range[prop];
+                    } catch (eNullRead) {
+                        throw new Error(
+                            "ROLLBACK_NULL_STATE_READ_FAILED: characters." +
+                            prop +
+                            " | segment=" +
+                            String(i) +
+                            " | " +
+                            eNullRead.message
+                        );
+                    }
+
+                    if (value === null) {
+                        continue;
+                    }
+
+                    throw new Error(
+                        "ROLLBACK_NULL_STATE_DIFFERS: characters." +
+                        prop +
+                        " | segment=" +
+                        String(i) +
+                        " | currentType=" +
+                        typeName(value) +
+                        " | typeof=" +
+                        (typeof value)
+                    );
+                }
+
+                if (segment.properties[prop].kind === "not_applicable") {
+                    continue;
+                }
+
                 value = decodeValue(
                     "characters." + prop,
                     segment.properties[prop],
@@ -1212,7 +1585,48 @@ var NormalFixMutateAdapter = (function () {
                     bindings
                 );
 
-                range[prop] = value;
+                if (segment.properties[prop].kind === "enum") {
+                    try {
+                        if (serializedEnumeratorMatchesLive(
+                                "characters." + prop,
+                                segment.properties[prop],
+                                range[prop]
+                            )) {
+                            continue;
+                        }
+                    } catch (eEnumRead) {
+                        throw new Error(
+                            "ROLLBACK_ENUM_STATE_READ_FAILED: characters." +
+                            prop +
+                            " | segment=" +
+                            String(i) +
+                            " | " +
+                            eEnumRead.message
+                        );
+                    }
+                }
+                try {
+                    range[prop] = value;
+                } catch (eCharacterAssign) {
+                    throw new Error(
+                        "ROLLBACK_CHARACTER_ASSIGNMENT_FAILED: characters." +
+                        prop +
+                        " | segment=" +
+                        String(i) +
+                        " | serializedKind=" +
+                        String(
+                            segment.properties[prop] &&
+                            segment.properties[prop].kind ||
+                            ""
+                        ) +
+                        " | decodedType=" +
+                        typeName(value) +
+                        " | typeof=" +
+                        (typeof value) +
+                        " | hostError=" +
+                        eCharacterAssign.message
+                    );
+                }
             }
         }
     }

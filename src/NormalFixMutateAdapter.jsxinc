@@ -1,0 +1,1556 @@
+/*
+ * NormalFix - CoreMutate production adapter
+ * Copyright (C) 2026 John Darby
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * Tool-specific adapter. Shared transaction and identity logic remain
+ * authoritative in localis-indesign-tools.
+ */
+
+var NormalFixMutateAdapter = (function () {
+    var VERSION = "0.1.0-dev2";
+    var ADAPTER_ID = "NormalFix/core-mutate";
+    var LAST_CONFORMANCE_VERSION = "";
+    var LAST_CONFORMANCE_DATE = "";
+
+    var STYLE_NAME = "Normal";
+    var CLI_RED_BODY_STYLE = "CLI Code Red Body";
+
+    var SUPPORTED_APP_VERSION = "21.5.1.73";
+    var SUPPORTED_DOM_VERSION = "21.5";
+
+    function valid(obj) {
+        if (obj === null || obj === undefined) {
+            return false;
+        }
+        try {
+            if (obj.isValid === false) {
+                return false;
+            }
+        } catch (eValid) {}
+        return true;
+    }
+
+    function requireDependencies() {
+        var registryCheck;
+        var identityCheck;
+
+        if (typeof CoreMutate === "undefined" || !CoreMutate) {
+            throw new Error("NormalFixMutateAdapter requires CoreMutate.");
+        }
+        if (typeof CoreIdentity === "undefined" || !CoreIdentity) {
+            throw new Error("NormalFixMutateAdapter requires CoreIdentity.");
+        }
+        if (typeof NormalFixSentinelNormalizer === "undefined" ||
+            !NormalFixSentinelNormalizer) {
+            throw new Error(
+                "NormalFixMutateAdapter requires NormalFixSentinelNormalizer."
+            );
+        }
+        if (typeof NormalFixIdentityCoverage === "undefined" ||
+            !NormalFixIdentityCoverage) {
+            throw new Error(
+                "NormalFixMutateAdapter requires NormalFixIdentityCoverage."
+            );
+        }
+        if (typeof NormalFixParagraphLocator === "undefined" ||
+            !NormalFixParagraphLocator) {
+            throw new Error(
+                "NormalFixMutateAdapter requires NormalFixParagraphLocator."
+            );
+        }
+        if (typeof NormalFixDigestRegistry === "undefined" ||
+            !NormalFixDigestRegistry) {
+            throw new Error(
+                "NormalFixMutateAdapter requires NormalFixDigestRegistry."
+            );
+        }
+
+        registryCheck = NormalFixDigestRegistry.validate();
+        if (!registryCheck.ok) {
+            throw new Error(
+                "ADAPTER_CONTRACT_MISMATCH: " + registryCheck.reason
+            );
+        }
+
+        identityCheck = NormalFixIdentityCoverage.validate(
+            NormalFixDigestRegistry.rows()
+        );
+        if (!identityCheck.ok) {
+            throw new Error(
+                "ADAPTER_CONTRACT_MISMATCH: " +
+                identityCheck.errors.join(" | ")
+            );
+        }
+
+        if (CoreIdentity.CONTRACT_VERSION !== "0.3.0") {
+            throw new Error(
+                "ADAPTER_CONTRACT_MISMATCH: CoreIdentity contract " +
+                CoreIdentity.CONTRACT_VERSION +
+                " is not 0.3.0."
+            );
+        }
+    }
+
+    function requireServices(services) {
+        var required = [
+            "hostIdentity",
+            "isInsideTable",
+            "paragraphStyleName",
+            "overrideState",
+            "findRedRuns",
+            "findCharacterStyle",
+            "characterStyleTargetColorStatus",
+            "applyCharacterStyleToRuns",
+            "applyCanonicalParagraphStyle",
+            "characterStyleSignature",
+            "redPositionSignature",
+            "allRedTextUsesCLIStyle"
+        ];
+        var i, name;
+
+        if (!services || typeof services !== "object") {
+            throw new Error(
+                "NormalFixMutateAdapter requires a services object."
+            );
+        }
+
+        for (i = 0; i < required.length; i++) {
+            name = required[i];
+            if (typeof services[name] !== "function") {
+                throw new Error(
+                    "NormalFixMutateAdapter service is missing: " + name
+                );
+            }
+        }
+    }
+
+    function hostPreflight(services) {
+        var host;
+
+        try {
+            host = services.hostIdentity();
+        } catch (eHost) {
+            return {
+                ok: false,
+                code: "UNSUPPORTED_HOST_VERSION",
+                reason: "Host identity could not be read: " + eHost.message
+            };
+        }
+
+        if (!host ||
+            String(host.appVersion || "") !== SUPPORTED_APP_VERSION ||
+            String(host.domVersion || "") !== SUPPORTED_DOM_VERSION) {
+            return {
+                ok: false,
+                code: "UNSUPPORTED_HOST_VERSION",
+                reason:
+                    "NormalFix adapter is qualified for InDesign " +
+                    SUPPORTED_APP_VERSION +
+                    " / DOM " +
+                    SUPPORTED_DOM_VERSION +
+                    "; observed " +
+                    String(host && host.appVersion || "") +
+                    " / DOM " +
+                    String(host && host.domVersion || "") +
+                    "."
+            };
+        }
+
+        return {ok: true, code: "", reason: ""};
+    }
+
+    function typeName(value) {
+        var out = "";
+
+        try {
+            if (value && value.reflect && value.reflect.name) {
+                out = String(value.reflect.name);
+                if (out.length > 0) {
+                    return out;
+                }
+            }
+        } catch (eReflect) {}
+
+        try {
+            if (value && typeof value.constructorName !== "undefined") {
+                out = String(value.constructorName);
+                if (out.length > 0) {
+                    return out;
+                }
+            }
+        } catch (eConstructor) {}
+
+        return out;
+    }
+
+    function isArray(value) {
+        return value instanceof Array;
+    }
+
+    function isEnumerator(value) {
+        return typeName(value) === "Enumerator";
+    }
+
+    function ownKeys(obj) {
+        var keys = [];
+        var key;
+
+        for (key in obj) {
+            try {
+                if (obj.hasOwnProperty && !obj.hasOwnProperty(key)) {
+                    continue;
+                }
+            } catch (eOwn) {}
+            keys.push(String(key));
+        }
+
+        keys.sort();
+        return keys;
+    }
+
+    function bindingMap() {
+        var bindings = NormalFixIdentityCoverage.identityBindings();
+        var out = {};
+        var i;
+
+        for (i = 0; i < bindings.length; i++) {
+            out[bindings[i].key] = bindings[i];
+        }
+
+        return out;
+    }
+
+    function familyAllowed(binding, family) {
+        var i;
+
+        if (!binding || !(binding.families instanceof Array)) {
+            return false;
+        }
+
+        for (i = 0; i < binding.families.length; i++) {
+            if (String(binding.families[i]) === String(family)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function isCoreNotApplicableSentinel(value) {
+        if (!value || typeof value !== "object") {
+            return false;
+        }
+
+        if (CoreIdentity.containsLiveHostObject(value)) {
+            return false;
+        }
+
+        try {
+            return String(value.__coreMutateSentinel || "") ===
+                "NOT_APPLICABLE";
+        } catch (eSentinel) {
+            return false;
+        }
+    }
+
+    function encodeValue(key, rawValue, doc, bindings, undefinedAsNA) {
+        var value = rawValue;
+        var t = typeof value;
+        var state;
+        var result;
+        var items;
+        var keys;
+        var i;
+
+        if (NormalFixSentinelNormalizer.isSentinelCapableKey(key)) {
+            value = NormalFixSentinelNormalizer.normalize(key, value);
+            t = typeof value;
+
+            if (isCoreNotApplicableSentinel(value)) {
+                return {kind: "not_applicable"};
+            }
+        }
+
+        if (t === "undefined") {
+            if (undefinedAsNA) {
+                return {kind: "not_applicable"};
+            }
+            throw new Error(key + " is undefined.");
+        }
+
+        if (t === "boolean" || t === "number" || t === "string") {
+            return {kind: "primitive", value: value};
+        }
+
+        if (value === null) {
+            return {kind: "null"};
+        }
+
+        if (isEnumerator(value)) {
+            result = Number(value);
+            if (isNaN(result)) {
+                throw new Error(key + " enumerator has no numeric value.");
+            }
+            return {
+                kind: "enum",
+                number: result,
+                text: String(value)
+            };
+        }
+
+        if (isArray(value)) {
+            items = [];
+            for (i = 0; i < value.length; i++) {
+                items.push(
+                    encodeValue(
+                        key,
+                        value[i],
+                        doc,
+                        bindings,
+                        undefinedAsNA
+                    )
+                );
+            }
+            return {kind: "array", items: items};
+        }
+
+        if (t === "object") {
+            result = CoreIdentity.serialize(value, doc);
+            if (result && result.ok) {
+                if (!bindings[key] ||
+                    !familyAllowed(bindings[key], result.state.family)) {
+                    throw new Error(
+                        "ADAPTER_CONTRACT_MISMATCH: host object for " +
+                        key +
+                        " resolved to unbound identity family " +
+                        result.state.family +
+                        "."
+                    );
+                }
+
+                state = {
+                    kind: "host_identity",
+                    state: result.state
+                };
+
+                if (CoreIdentity.containsLiveHostObject(state)) {
+                    throw new Error(
+                        key + " identity serialization retained a live host object."
+                    );
+                }
+
+                return state;
+            }
+
+            if (typeName(value) !== "" && typeName(value) !== "Object") {
+                throw new Error(
+                    key +
+                    " contains unsupported host value " +
+                    typeName(value) +
+                    " (" +
+                    String(result && result.status || "UNKNOWN") +
+                    ")."
+                );
+            }
+
+            state = {kind: "object", props: {}};
+            keys = ownKeys(value);
+
+            for (i = 0; i < keys.length; i++) {
+                if (typeof value[keys[i]] === "function") {
+                    continue;
+                }
+                state.props[keys[i]] = encodeValue(
+                    key,
+                    value[keys[i]],
+                    doc,
+                    bindings,
+                    undefinedAsNA
+                );
+            }
+
+            if (CoreIdentity.containsLiveHostObject(state)) {
+                throw new Error(
+                    key + " plain-object serialization retained a live host object."
+                );
+            }
+
+            return state;
+        }
+
+        throw new Error(
+            key +
+            " has unsupported value type " +
+            t +
+            "."
+        );
+    }
+
+    function decodeValue(key, state, doc, bindings) {
+        var result;
+        var out;
+        var keys;
+        var i;
+
+        if (!state || typeof state !== "object") {
+            throw new Error(key + " has invalid serialized state.");
+        }
+
+        if (state.kind === "not_applicable") {
+            try {
+                return NothingEnum.NOTHING;
+            } catch (eNothing) {
+                throw new Error(
+                    key + " could not reconstruct NothingEnum.NOTHING."
+                );
+            }
+        }
+
+        if (state.kind === "primitive") {
+            return state.value;
+        }
+
+        if (state.kind === "null") {
+            return null;
+        }
+
+        if (state.kind === "enum") {
+            result = Number(state.number);
+            if (isNaN(result)) {
+                throw new Error(key + " has invalid enumerator state.");
+            }
+            return result;
+        }
+
+        if (state.kind === "host_identity") {
+            if (!state.state ||
+                !bindings[key] ||
+                !familyAllowed(bindings[key], state.state.family)) {
+                throw new Error(
+                    "ADAPTER_CONTRACT_MISMATCH: invalid identity binding for " +
+                    key +
+                    "."
+                );
+            }
+
+            result = CoreIdentity.resolve(doc, state.state);
+            if (!result || !result.ok || !valid(result.candidate)) {
+                throw new Error(
+                    key +
+                    " identity refused reconstruction: " +
+                    String(result && result.status || "RESOLVE_FAILED")
+                );
+            }
+
+            return result.candidate;
+        }
+
+        if (state.kind === "array") {
+            out = [];
+            for (i = 0; i < state.items.length; i++) {
+                out.push(
+                    decodeValue(
+                        key,
+                        state.items[i],
+                        doc,
+                        bindings
+                    )
+                );
+            }
+            return out;
+        }
+
+        if (state.kind === "object") {
+            out = {};
+            keys = ownKeys(state.props || {});
+            for (i = 0; i < keys.length; i++) {
+                out[keys[i]] = decodeValue(
+                    key,
+                    state.props[keys[i]],
+                    doc,
+                    bindings
+                );
+            }
+            return out;
+        }
+
+        throw new Error(
+            key + " has unsupported serialized kind " + state.kind + "."
+        );
+    }
+
+    function encodeTabList(para, doc, bindings) {
+        var state = {kind: "tabList", tabs: []};
+        var stops = para.tabStops;
+        var i, stop;
+
+        for (i = 0; i < stops.length; i++) {
+            stop = stops.item ? stops.item(i) : stops[i];
+
+            state.tabs.push({
+                position: encodeValue(
+                    "paragraph.tabList",
+                    stop.position,
+                    doc,
+                    bindings,
+                    false
+                ),
+                alignment: encodeValue(
+                    "paragraph.tabList",
+                    stop.alignment,
+                    doc,
+                    bindings,
+                    false
+                ),
+                leader: encodeValue(
+                    "paragraph.tabList",
+                    stop.leader,
+                    doc,
+                    bindings,
+                    false
+                ),
+                alignmentCharacter: encodeValue(
+                    "paragraph.tabList",
+                    stop.alignmentCharacter,
+                    doc,
+                    bindings,
+                    false
+                )
+            });
+        }
+
+        return state;
+    }
+
+    function decodeTabList(state, doc, bindings) {
+        var out = [];
+        var i, tab;
+
+        if (!state || state.kind !== "tabList") {
+            throw new Error("paragraph.tabList has invalid serialized state.");
+        }
+
+        for (i = 0; i < state.tabs.length; i++) {
+            tab = state.tabs[i];
+            out.push({
+                position: decodeValue(
+                    "paragraph.tabList",
+                    tab.position,
+                    doc,
+                    bindings
+                ),
+                alignment: decodeValue(
+                    "paragraph.tabList",
+                    tab.alignment,
+                    doc,
+                    bindings
+                ),
+                leader: decodeValue(
+                    "paragraph.tabList",
+                    tab.leader,
+                    doc,
+                    bindings
+                ),
+                alignmentCharacter: decodeValue(
+                    "paragraph.tabList",
+                    tab.alignmentCharacter,
+                    doc,
+                    bindings
+                )
+            });
+        }
+
+        return out;
+    }
+
+    function firstStoryIndex(textObject) {
+        var n;
+
+        try {
+            n = Number(textObject.index);
+            if (!isNaN(n)) {
+                return n;
+            }
+        } catch (eIndex) {}
+
+        try {
+            if (textObject.insertionPoints.length > 0) {
+                n = Number(textObject.insertionPoints.item(0).index);
+                if (!isNaN(n)) {
+                    return n;
+                }
+            }
+        } catch (eInsertion) {}
+
+        try {
+            if (textObject.characters.length > 0) {
+                n = Number(textObject.characters.item(0).index);
+                if (!isNaN(n)) {
+                    return n;
+                }
+            }
+        } catch (eCharacter) {}
+
+        throw new Error("Could not derive story-relative text index.");
+    }
+
+    function captureCharacterSnapshot(doc, para, charProps, bindings) {
+        var ranges = para.textStyleRanges;
+        var count = ranges.length;
+        var rawProps;
+        var propsArray;
+        var paragraphStart = firstStoryIndex(para);
+        var charCount = para.characters.length;
+        var result = {
+            segments: [],
+            rollbackReady: true,
+            errors: []
+        };
+        var i, j, range, start, rel, length, from, to, prop;
+        var segment;
+
+        try {
+            rawProps = ranges.everyItem().properties;
+        } catch (eProps) {
+            result.rollbackReady = false;
+            result.errors.push(
+                "characters:textStyleRanges.everyItem().properties:" +
+                eProps.message
+            );
+            return result;
+        }
+
+        if (rawProps instanceof Array) {
+            propsArray = rawProps;
+        } else if (count === 1) {
+            propsArray = [rawProps];
+        } else {
+            result.rollbackReady = false;
+            result.errors.push(
+                "characters:run properties returned scalar for " +
+                count +
+                " runs"
+            );
+            return result;
+        }
+
+        if (propsArray.length !== count) {
+            result.rollbackReady = false;
+            result.errors.push(
+                "characters:run property count " +
+                propsArray.length +
+                " != " +
+                count
+            );
+            return result;
+        }
+
+        for (i = 0; i < count; i++) {
+            range = ranges.item(i);
+            length = range.characters.length;
+            start = firstStoryIndex(range);
+            rel = start - paragraphStart;
+
+            from = rel < 0 ? 0 : rel;
+            to = rel + length - 1;
+
+            if (to >= charCount) {
+                to = charCount - 1;
+            }
+
+            if (from > to || to < 0 || from >= charCount) {
+                continue;
+            }
+
+            segment = {
+                from: from,
+                to: to,
+                properties: {}
+            };
+
+            for (j = 0; j < charProps.length; j++) {
+                prop = charProps[j];
+                try {
+                    segment.properties[prop] = encodeValue(
+                        "characters." + prop,
+                        propsArray[i][prop],
+                        doc,
+                        bindings,
+                        true
+                    );
+                } catch (eProp) {
+                    result.rollbackReady = false;
+                    result.errors.push(
+                        "characters." +
+                        prop +
+                        ":" +
+                        eProp.message
+                    );
+                }
+            }
+
+            result.segments.push(segment);
+        }
+
+        return result;
+    }
+
+    function captureSnapshot(doc, para, paragraphProps, charProps, bindings) {
+        var snapshot = {
+            contents: "",
+            paragraphStyle: null,
+            paragraphProperties: {},
+            characterSegments: [],
+            rollbackReady: true,
+            rollbackReason: "",
+            errors: [],
+            expectedPost: null
+        };
+        var props;
+        var i, prop;
+        var charSnapshot;
+
+        try {
+            snapshot.contents = String(para.contents);
+        } catch (eContents) {
+            snapshot.rollbackReady = false;
+            snapshot.errors.push(
+                "text.targetContents:" + eContents.message
+            );
+        }
+
+        try {
+            snapshot.paragraphStyle = encodeValue(
+                "paragraph.appliedParagraphStyle",
+                para.appliedParagraphStyle,
+                doc,
+                bindings,
+                false
+            );
+        } catch (eStyle) {
+            snapshot.rollbackReady = false;
+            snapshot.errors.push(
+                "paragraph.appliedParagraphStyle:" + eStyle.message
+            );
+        }
+
+        try {
+            props = para.properties;
+        } catch (eProps) {
+            snapshot.rollbackReady = false;
+            snapshot.errors.push(
+                "paragraph.properties:" + eProps.message
+            );
+            props = null;
+        }
+
+        if (props !== null) {
+            for (i = 0; i < paragraphProps.length; i++) {
+                prop = paragraphProps[i];
+
+                try {
+                    if (prop === "tabList") {
+                        snapshot.paragraphProperties[prop] =
+                            encodeTabList(para, doc, bindings);
+                    } else {
+                        if (typeof props[prop] === "undefined") {
+                            throw new Error("@UNDEFINED");
+                        }
+
+                        snapshot.paragraphProperties[prop] = encodeValue(
+                            "paragraph." + prop,
+                            props[prop],
+                            doc,
+                            bindings,
+                            false
+                        );
+                    }
+                } catch (eProp) {
+                    snapshot.rollbackReady = false;
+                    snapshot.errors.push(
+                        "paragraph." +
+                        prop +
+                        ":" +
+                        eProp.message
+                    );
+                }
+            }
+        }
+
+        try {
+            charSnapshot = captureCharacterSnapshot(
+                doc,
+                para,
+                charProps,
+                bindings
+            );
+
+            snapshot.characterSegments =
+                charSnapshot.segments;
+
+            if (!charSnapshot.rollbackReady) {
+                snapshot.rollbackReady = false;
+            }
+
+            for (i = 0; i < charSnapshot.errors.length; i++) {
+                snapshot.errors.push(
+                    charSnapshot.errors[i]
+                );
+            }
+        } catch (eCharacter) {
+            snapshot.rollbackReady = false;
+            snapshot.errors.push(
+                "characters:" + eCharacter.message
+            );
+        }
+
+        if (CoreIdentity.containsLiveHostObject(snapshot)) {
+            snapshot.rollbackReady = false;
+            snapshot.errors.push(
+                "snapshot retained a live host object"
+            );
+        }
+
+        snapshot.rollbackReason =
+            snapshot.errors.join(" | ");
+
+        return snapshot;
+    }
+
+    function digestValue(key, rawValue, doc, bindings, undefinedAsNA) {
+        var encoded;
+
+        if (typeof rawValue === "undefined" && !undefinedAsNA) {
+            return "@UNDEFINED";
+        }
+
+        encoded = encodeValue(
+            key,
+            rawValue,
+            doc,
+            bindings,
+            undefinedAsNA
+        );
+
+        if (encoded.kind === "not_applicable") {
+            return CoreMutate.NOT_APPLICABLE;
+        }
+
+        return encoded;
+    }
+
+    function rawStoryFingerprint(story) {
+        var contents;
+
+        try {
+            contents = String(story.contents);
+        } catch (eContents) {
+            throw new Error(
+                "story.contents unavailable: " + eContents.message
+            );
+        }
+
+        return NormalFixParagraphLocator.textFingerprint(contents);
+    }
+
+    function canonicalTabListDigest(para, doc, bindings) {
+        return encodeTabList(para, doc, bindings);
+    }
+
+    function emptyArray(length, value) {
+        var out = [];
+        var i;
+
+        for (i = 0; i < length; i++) {
+            out.push(value);
+        }
+
+        return out;
+    }
+
+    function assignRangeValue(slots, start, length, value) {
+        var from = start < 0 ? 0 : start;
+        var to = start + length;
+        var i;
+
+        if (to > slots.length) {
+            to = slots.length;
+        }
+
+        for (i = from; i < to; i++) {
+            slots[i] = value;
+        }
+    }
+
+    function captureCharacterDigest(doc, para, charProps, bindings, services) {
+        var ranges = para.textStyleRanges;
+        var runCount = ranges.length;
+        var charCount = para.characters.length;
+        var paragraphStart = firstStoryIndex(para);
+        var rawProps;
+        var runProps;
+        var propSlots = {};
+        var signatures = {};
+        var i, j, prop, range, start, rel, length, value;
+        var serializedSlots;
+
+        try {
+            rawProps = ranges.everyItem().properties;
+        } catch (eProps) {
+            throw new Error(
+                "textStyleRanges.everyItem().properties:" +
+                eProps.message
+            );
+        }
+
+        if (rawProps instanceof Array) {
+            runProps = rawProps;
+        } else if (runCount === 1) {
+            runProps = [rawProps];
+        } else {
+            throw new Error(
+                "run properties returned scalar for " +
+                runCount +
+                " runs"
+            );
+        }
+
+        if (runProps.length !== runCount) {
+            throw new Error(
+                "run property count " +
+                runProps.length +
+                " != " +
+                runCount
+            );
+        }
+
+        for (i = 0; i < charProps.length; i++) {
+            propSlots[charProps[i]] =
+                emptyArray(charCount, CoreMutate.NOT_APPLICABLE);
+        }
+
+        for (i = 0; i < runCount; i++) {
+            range = ranges.item(i);
+            length = range.characters.length;
+            start = firstStoryIndex(range);
+            rel = start - paragraphStart;
+
+            for (j = 0; j < charProps.length; j++) {
+                prop = charProps[j];
+                value = digestValue(
+                    "characters." + prop,
+                    runProps[i][prop],
+                    doc,
+                    bindings,
+                    true
+                );
+
+                assignRangeValue(
+                    propSlots[prop],
+                    rel,
+                    length,
+                    value
+                );
+            }
+        }
+
+        for (i = 0; i < charProps.length; i++) {
+            prop = charProps[i];
+            serializedSlots = CoreMutate.canonicalSerialize(
+                propSlots[prop]
+            );
+            signatures[prop] =
+                NormalFixParagraphLocator.textFingerprint(
+                    serializedSlots
+                );
+        }
+
+        return {
+            propertySignatures: signatures,
+            redPositionSignature:
+                String(services.redPositionSignature(para))
+        };
+    }
+
+    function collectionItem(collection, index) {
+        if (collection instanceof Array) {
+            return collection[index];
+        }
+        if (collection && typeof collection.item === "function") {
+            return collection.item(index);
+        }
+        return collection[index];
+    }
+
+    function compositionState(para) {
+        var lineParts = [];
+        var frameParts = [];
+        var lines = para.lines;
+        var frames = para.parentTextFrames;
+        var i, line, frame;
+        var overset;
+
+        for (i = 0; i < lines.length; i++) {
+            line = collectionItem(lines, i);
+            lineParts.push(String(line.contents));
+        }
+
+        for (i = 0; i < frames.length; i++) {
+            frame = collectionItem(frames, i);
+            if (!valid(frame)) {
+                throw new Error(
+                    "composition.frameSpanSignature encountered an invalid frame."
+                );
+            }
+            frameParts.push(String(frame.id));
+        }
+
+        overset = String(para.parentStory.overflows);
+
+        return {
+            lineCount: String(lines.length),
+            lineBreakSignature:
+                NormalFixParagraphLocator.textFingerprint(
+                    lineParts.join("|")
+                ),
+            frameSpanSignature:
+                frameParts.join(","),
+            oversetState: overset
+        };
+    }
+
+    function captureDigest(
+        doc,
+        para,
+        paragraphProps,
+        charProps,
+        bindings,
+        services
+    ) {
+        var digest = {};
+        var story = para.parentStory;
+        var props = para.properties;
+        var charDigest;
+        var composition;
+        var override;
+        var i, prop;
+
+        digest["text.targetContents"] =
+            String(para.contents);
+
+        digest["text.storyFingerprint"] =
+            rawStoryFingerprint(story);
+
+        digest["text.storyParagraphCount"] =
+            String(story.paragraphs.length);
+
+        digest["paragraph.appliedParagraphStyle"] =
+            digestValue(
+                "paragraph.appliedParagraphStyle",
+                para.appliedParagraphStyle,
+                doc,
+                bindings,
+                false
+            );
+
+        override = services.overrideState(para);
+        if (!override || override.value === null ||
+            typeof override.value === "undefined") {
+            throw new Error(
+                "paragraph.overrideState is unavailable."
+            );
+        }
+
+        digest["paragraph.overrideState"] =
+            String(override.value === true);
+
+        for (i = 0; i < paragraphProps.length; i++) {
+            prop = paragraphProps[i];
+
+            if (prop === "tabList") {
+                digest["paragraph." + prop] =
+                    canonicalTabListDigest(
+                        para,
+                        doc,
+                        bindings
+                    );
+            } else {
+                digest["paragraph." + prop] =
+                    digestValue(
+                        "paragraph." + prop,
+                        props[prop],
+                        doc,
+                        bindings,
+                        false
+                    );
+            }
+        }
+
+        charDigest = captureCharacterDigest(
+            doc,
+            para,
+            charProps,
+            bindings,
+            services
+        );
+
+        for (i = 0; i < charProps.length; i++) {
+            prop = charProps[i];
+            digest["characters." + prop] =
+                charDigest.propertySignatures[prop];
+        }
+
+        digest["red.positionSignature"] =
+            charDigest.redPositionSignature;
+
+        composition = compositionState(para);
+
+        digest["composition.lineCount"] =
+            composition.lineCount;
+        digest["composition.lineBreakSignature"] =
+            composition.lineBreakSignature;
+        digest["composition.frameSpanSignature"] =
+            composition.frameSpanSignature;
+        digest["composition.oversetState"] =
+            composition.oversetState;
+
+        return digest;
+    }
+
+    function restoreSnapshot(
+        doc,
+        para,
+        snapshot,
+        paragraphProps,
+        charProps,
+        bindings
+    ) {
+        var style;
+        var i, j, prop, value, segment, range;
+
+        if (!snapshot || snapshot.rollbackReady !== true) {
+            throw new Error(
+                "Rollback snapshot is not ready."
+            );
+        }
+
+        if (String(para.contents) !== String(snapshot.contents)) {
+            para.contents = snapshot.contents;
+        }
+
+        style = decodeValue(
+            "paragraph.appliedParagraphStyle",
+            snapshot.paragraphStyle,
+            doc,
+            bindings
+        );
+
+        para.appliedParagraphStyle = style;
+
+        for (i = 0; i < paragraphProps.length; i++) {
+            prop = paragraphProps[i];
+
+            if (!snapshot.paragraphProperties[prop]) {
+                throw new Error(
+                    "Rollback snapshot is missing paragraph." +
+                    prop +
+                    "."
+                );
+            }
+
+            if (prop === "tabList") {
+                value = decodeTabList(
+                    snapshot.paragraphProperties[prop],
+                    doc,
+                    bindings
+                );
+            } else {
+                value = decodeValue(
+                    "paragraph." + prop,
+                    snapshot.paragraphProperties[prop],
+                    doc,
+                    bindings
+                );
+            }
+
+            para[prop] = value;
+        }
+
+        for (i = 0; i < snapshot.characterSegments.length; i++) {
+            segment = snapshot.characterSegments[i];
+
+            if (segment.from < 0 ||
+                segment.to < segment.from ||
+                segment.to >= para.characters.length) {
+                throw new Error(
+                    "Rollback character segment is outside the paragraph."
+                );
+            }
+
+            range = para.characters.itemByRange(
+                segment.from,
+                segment.to
+            );
+
+            for (j = 0; j < charProps.length; j++) {
+                prop = charProps[j];
+
+                if (!segment.properties[prop]) {
+                    throw new Error(
+                        "Rollback snapshot is missing characters." +
+                        prop +
+                        "."
+                    );
+                }
+
+                value = decodeValue(
+                    "characters." + prop,
+                    segment.properties[prop],
+                    doc,
+                    bindings
+                );
+
+                range[prop] = value;
+            }
+        }
+    }
+
+    function create(doc, services) {
+        var paragraphProps;
+        var charProps;
+        var coverage;
+        var bindings;
+        var preflight;
+
+        requireDependencies();
+        requireServices(services);
+
+        if (!valid(doc)) {
+            throw new Error(
+                "NormalFixMutateAdapter.create requires a valid document."
+            );
+        }
+
+        paragraphProps =
+            NormalFixDigestRegistry.paragraphProperties();
+        charProps =
+            NormalFixDigestRegistry.characterProperties();
+        coverage =
+            NormalFixDigestRegistry.keys();
+        bindings = bindingMap();
+        preflight = hostPreflight(services);
+
+        function resolveLocator(locator) {
+            return NormalFixParagraphLocator.resolve(
+                doc,
+                locator
+            );
+        }
+
+        function precheck(target, locator) {
+            var override;
+            var redRuns;
+            var redStyle;
+            var colorStatus;
+
+            if (!preflight.ok) {
+                return {
+                    eligible: false,
+                    reason:
+                        preflight.code +
+                        ": " +
+                        preflight.reason
+                };
+            }
+
+            if (!valid(target)) {
+                return {
+                    eligible: false,
+                    reason: "Paragraph is no longer valid."
+                };
+            }
+
+            if (services.isInsideTable(target)) {
+                return {
+                    eligible: false,
+                    reason: "Paragraph is now inside a table."
+                };
+            }
+
+            if (services.paragraphStyleName(target) !== STYLE_NAME) {
+                return {
+                    eligible: false,
+                    reason: "Paragraph is no longer Normal."
+                };
+            }
+
+            override = services.overrideState(target);
+            if (!override || override.value !== true) {
+                return {
+                    eligible: false,
+                    reason:
+                        "Paragraph no longer has verified Normal+ state."
+                };
+            }
+
+            redRuns = services.findRedRuns(target);
+
+            if (redRuns.length > 0) {
+                redStyle = services.findCharacterStyle(
+                    doc,
+                    CLI_RED_BODY_STYLE
+                );
+
+                if (!valid(redStyle)) {
+                    return {
+                        eligible: false,
+                        reason:
+                            CLI_RED_BODY_STYLE +
+                            " could not be resolved exactly once."
+                    };
+                }
+
+                colorStatus =
+                    services.characterStyleTargetColorStatus(
+                        redStyle
+                    );
+
+                if (String(colorStatus).indexOf("Mismatch") === 0) {
+                    return {
+                        eligible: false,
+                        reason:
+                            CLI_RED_BODY_STYLE +
+                            " RGB definition is mismatched."
+                    };
+                }
+            }
+
+            return {eligible: true, reason: ""};
+        }
+
+        function snapshot(target, locator) {
+            return captureSnapshot(
+                doc,
+                target,
+                paragraphProps,
+                charProps,
+                bindings
+            );
+        }
+
+        function digestCoverage(target, locator) {
+            var out = [];
+            var i;
+
+            for (i = 0; i < coverage.length; i++) {
+                out.push(coverage[i]);
+            }
+
+            return out;
+        }
+
+        function rollbackDigest(target, locator) {
+            return captureDigest(
+                doc,
+                target,
+                paragraphProps,
+                charProps,
+                bindings,
+                services
+            );
+        }
+
+        function mutate(target, snapshotState, locator) {
+            var redRuns;
+            var redStyle;
+            var colorStatus;
+            var canonicalStyle;
+            var applied;
+
+            redRuns = services.findRedRuns(target);
+
+            if (redRuns.length > 0) {
+                redStyle = services.findCharacterStyle(
+                    doc,
+                    CLI_RED_BODY_STYLE
+                );
+
+                if (!valid(redStyle)) {
+                    throw new Error(
+                        CLI_RED_BODY_STYLE +
+                        " could not be resolved."
+                    );
+                }
+
+                colorStatus =
+                    services.characterStyleTargetColorStatus(
+                        redStyle
+                    );
+
+                if (String(colorStatus).indexOf("Mismatch") === 0) {
+                    throw new Error(
+                        CLI_RED_BODY_STYLE +
+                        " RGB definition is mismatched."
+                    );
+                }
+
+                services.applyCharacterStyleToRuns(
+                    target,
+                    redRuns,
+                    redStyle
+                );
+            }
+
+            snapshotState.expectedPost = {
+                characterStyleSignature:
+                    String(
+                        services.characterStyleSignature(
+                            target
+                        )
+                    ),
+                redPositionSignature:
+                    String(
+                        services.redPositionSignature(
+                            target
+                        )
+                    ),
+                redRuns: redRuns.length
+            };
+
+            canonicalStyle = decodeValue(
+                "paragraph.appliedParagraphStyle",
+                snapshotState.paragraphStyle,
+                doc,
+                bindings
+            );
+
+            applied = services.applyCanonicalParagraphStyle(
+                target,
+                canonicalStyle
+            );
+
+            if (applied === false) {
+                throw new Error(
+                    "Paragraph-only overrides could not be cleared."
+                );
+            }
+        }
+
+        function verify(
+            target,
+            snapshotState,
+            preDigestRaw,
+            locator
+        ) {
+            var reasons = [];
+            var override;
+
+            if (!snapshotState.expectedPost) {
+                return {
+                    ok: false,
+                    reason:
+                        "Mutation did not record the post-red preservation baseline."
+                };
+            }
+
+            if (services.paragraphStyleName(target) !== STYLE_NAME) {
+                reasons.push(
+                    "Normal paragraph style could not be verified."
+                );
+            }
+
+            override = services.overrideState(target);
+            if (!override || override.value !== false) {
+                reasons.push(
+                    "A local override remains after paragraph-only cleanup."
+                );
+            }
+
+            if (String(
+                    services.characterStyleSignature(target)
+                ) !==
+                snapshotState.expectedPost.characterStyleSignature) {
+                reasons.push(
+                    "Applied character-style assignments changed during paragraph cleanup."
+                );
+            }
+
+            if (String(
+                    services.redPositionSignature(target)
+                ) !==
+                snapshotState.expectedPost.redPositionSignature) {
+                reasons.push(
+                    "Red character positions changed during paragraph cleanup."
+                );
+            }
+
+            if (!services.allRedTextUsesCLIStyle(target)) {
+                reasons.push(
+                    "One or more red-family characters do not use " +
+                    CLI_RED_BODY_STYLE +
+                    "."
+                );
+            }
+
+            return {
+                ok: reasons.length === 0,
+                reason: reasons.join(" ")
+            };
+        }
+
+        function rollback(target, snapshotState, locator) {
+            restoreSnapshot(
+                doc,
+                target,
+                snapshotState,
+                paragraphProps,
+                charProps,
+                bindings
+            );
+        }
+
+        return {
+            adapterId: ADAPTER_ID,
+            adapterVersion: VERSION,
+            lastConformanceVersion:
+                LAST_CONFORMANCE_VERSION,
+            lastConformanceDate:
+                LAST_CONFORMANCE_DATE,
+
+            preflight: function () {
+                return {
+                    ok: preflight.ok,
+                    code: preflight.code,
+                    reason: preflight.reason
+                };
+            },
+
+            resolve: resolveLocator,
+            precheck: precheck,
+            snapshot: snapshot,
+            digestCoverage: digestCoverage,
+            rollbackDigest: rollbackDigest,
+            mutate: mutate,
+            verify: verify,
+            rollback: rollback,
+            compareLocators:
+                NormalFixParagraphLocator.compareLocators
+        };
+    }
+
+    return {
+        VERSION: VERSION,
+        ADAPTER_ID: ADAPTER_ID,
+        LAST_CONFORMANCE_VERSION:
+            LAST_CONFORMANCE_VERSION,
+        LAST_CONFORMANCE_DATE:
+            LAST_CONFORMANCE_DATE,
+        SUPPORTED_APP_VERSION:
+            SUPPORTED_APP_VERSION,
+        SUPPORTED_DOM_VERSION:
+            SUPPORTED_DOM_VERSION,
+        create: create
+    };
+}());

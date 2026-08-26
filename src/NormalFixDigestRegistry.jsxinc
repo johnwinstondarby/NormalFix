@@ -1,0 +1,364 @@
+/*
+ * NormalFix - frozen digest registry runtime mirror
+ * Copyright (C) 2026 John Darby
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * GENERATED from NORMALFIX_DIGEST_KEY_REGISTRY_v1.0_FROZEN.csv.
+ * Do not hand edit. Regenerate from the frozen CSV.
+ * Source SHA-256: 7D50678C887718F36546E8664836DE696E60EE7AA0DB392994DAC3FC0BE996D8
+ */
+
+var NormalFixDigestRegistry = (function () {
+    var VERSION = "1.0.0-dev1";
+    var FROZEN_KEY_COUNT = 243;
+    var SOURCE_SHA256 = "7D50678C887718F36546E8664836DE696E60EE7AA0DB392994DAC3FC0BE996D8";
+
+    var ROWS = [
+        {"Key":"text.targetContents","Category":"text","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"Exact target text; formatting-only invariant"},
+        {"Key":"text.storyFingerprint","Category":"text","Snapshot Role":"COVERAGE_ONLY","Digest Role":"REQUIRED","Proof / Evidence":"6/6 structural canary; raw UTF-16 story.contents path"},
+        {"Key":"text.storyParagraphCount","Category":"text","Snapshot Role":"COVERAGE_ONLY","Digest Role":"REQUIRED","Proof / Evidence":"Paragraph insertion/deletion collateral detector"},
+        {"Key":"paragraph.appliedParagraphStyle","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"Exact style identity"},
+        {"Key":"paragraph.overrideState","Category":"paragraph","Snapshot Role":"COVERAGE_ONLY","Digest Role":"REQUIRED","Proof / Evidence":"Live override-state result"},
+        {"Key":"paragraph.alignToBaseline","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.appliedNumberingList","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.autoLeading","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.balanceRaggedLines","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.bulletsAlignment","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.bulletsAndNumberingListType","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.bulletsCharacterStyle","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.bulletsTextAfter","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.bunriKinshi","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.characterDirection","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.cjkGridTracking","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.composer","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.desiredGlyphScaling","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.desiredLetterSpacing","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.desiredWordSpacing","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.dropCapCharacters","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.dropCapLines","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.dropCapStyle","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.dropcapDetail","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.firstLineIndent","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.gridAlignFirstLineOnly","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.gridAlignment","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.gridGyoudori","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.hyphenWeight","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.hyphenateAfterFirst","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.hyphenateBeforeLast","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.hyphenateCapitalizedWords","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.hyphenateLadderLimit","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.hyphenateLastWord","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.hyphenateWordsLongerThan","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.hyphenation","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.hyphenationZone","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.jidori","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.justification","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.kashidas","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.keepAllLinesTogether","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.keepFirstLines","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.keepLastLines","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.keepLinesTogether","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.keepWithNext","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.keepWithPrevious","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.kinsokuHangType","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.kinsokuSet","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.kinsokuType","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.lastLineIndent","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.leadingModel","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.leftIndent","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.maximumGlyphScaling","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.maximumLetterSpacing","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.maximumWordSpacing","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.mergeConsecutiveParaBorders","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.minimumGlyphScaling","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.minimumLetterSpacing","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.minimumWordSpacing","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.mojikumi","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.numberingAlignment","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.numberingApplyRestartPolicy","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.numberingCharacterStyle","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.numberingContinue","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.numberingExpression","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.numberingFormat","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.numberingLevel","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.numberingStartAt","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderBottomLeftCornerOption","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderBottomLeftCornerRadius","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderBottomLineWeight","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderBottomOffset","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderBottomOrigin","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderBottomRightCornerOption","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderBottomRightCornerRadius","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderColor","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderDisplayIfSplits","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderGapColor","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderGapOverprint","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderGapTint","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderLeftLineWeight","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderLeftOffset","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderOn","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderOverprint","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderRightLineWeight","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderRightOffset","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderStrokeEndCap","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderStrokeEndJoin","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderTint","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderTopLeftCornerOption","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderTopLeftCornerRadius","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderTopLineWeight","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderTopOffset","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderTopOrigin","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderTopRightCornerOption","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderTopRightCornerRadius","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderType","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphBorderWidth","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphDirection","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphGyoudori","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphKashidaWidth","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingBottomLeftCornerOption","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingBottomLeftCornerRadius","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingBottomOffset","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingBottomOrigin","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingBottomRightCornerOption","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingBottomRightCornerRadius","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingClipToFrame","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingColor","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingLeftOffset","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingOn","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingOverprint","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingRightOffset","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingSuppressPrinting","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingTint","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingTopLeftCornerOption","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingTopLeftCornerRadius","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingTopOffset","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingTopOrigin","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingTopRightCornerOption","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingTopRightCornerRadius","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.paragraphShadingWidth","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rightIndent","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyAlignment","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyAutoAlign","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyAutoScaling","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyAutoTcyAutoScale","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyAutoTcyDigits","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyAutoTcyIncludeRoman","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyFill","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyFont","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyFontSize","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyFontStyle","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyOpenTypePro","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyOverhang","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyOverprintFill","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyOverprintStroke","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyParentOverhangAmount","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyParentScalingPercent","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyParentSpacing","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyPosition","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyStroke","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyStrokeTint","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyTint","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyType","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyWeight","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyXOffset","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyXScale","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyYOffset","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.rubyYScale","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleAbove","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleAboveColor","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleAboveLeftIndent","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleAboveLineWeight","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleAboveOffset","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleAboveRightIndent","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleAboveTint","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleAboveWidth","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleBelow","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleBelowColor","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleBelowLeftIndent","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleBelowLineWeight","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleBelowOffset","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleBelowRightIndent","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleBelowTint","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.ruleBelowWidth","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.sameParaStyleSpacing","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.singleWordJustification","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.spaceAfter","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.spaceBefore","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.spanColumnMinSpaceAfter","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.spanColumnMinSpaceBefore","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.spanColumnType","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.spanSplitColumnCount","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.splitColumnInsideGutter","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.splitColumnOutsideGutter","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.startParagraph","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.tabList","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.warichu","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.warichuAlignment","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.warichuCharsAfterBreak","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.warichuCharsBeforeBreak","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.warichuLineSpacing","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.warichuLines","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"paragraph.warichuSize","Category":"paragraph","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"180-property empirical census + serialized reconstruction"},
+        {"Key":"characters.appliedCharacterStyle","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.appliedFont","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.fontStyle","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.pointSize","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.leading","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.tracking","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.kerningMethod","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.kerningValue","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges; read-derived Mutate.NOT_APPLICABLE where absent"},
+        {"Key":"characters.baselineShift","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.horizontalScale","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.verticalScale","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.skew","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.fillColor","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.fillTint","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.strokeColor","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.strokeTint","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.strokeWeight","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.underline","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.strikeThru","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.capitalization","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.position","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.noBreak","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.ligatures","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.appliedLanguage","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfContextualAlternate","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfDiscretionaryLigature","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfFraction","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfHVKana","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfHistorical","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfJustificationAlternate","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfLocale","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfMark","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfOrdinal","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfOverlapSwash","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfProportionalMetrics","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfRomanItalics","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfSlashedZero","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfStretchedAlternate","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfStylisticAlternate","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfSwash","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfTitling","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfFigureStyle","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.otfStylisticSets","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.underlineColor","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.underlineTint","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.underlineWeight","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.underlineOffset","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.underlineType","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.strikeThroughColor","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.strikeThroughTint","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.strikeThroughWeight","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.strikeThroughOffset","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"characters.strikeThroughType","Category":"character","Snapshot Role":"RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"53/53 live equivalence; position-mapped textStyleRanges"},
+        {"Key":"red.positionSignature","Category":"character","Snapshot Role":"DERIVED_FROM_RECONSTRUCTIVE","Digest Role":"REQUIRED","Proof / Evidence":"Red-position preservation/verification signature"},
+        {"Key":"composition.lineCount","Category":"composition","Snapshot Role":"COVERAGE_ONLY","Digest Role":"REQUIRED","Proof / Evidence":"4/4 fixture stability; 8 no-op recompositions each"},
+        {"Key":"composition.lineBreakSignature","Category":"composition","Snapshot Role":"COVERAGE_ONLY","Digest Role":"REQUIRED","Proof / Evidence":"4/4 fixture stability; 8 no-op recompositions each"},
+        {"Key":"composition.frameSpanSignature","Category":"composition","Snapshot Role":"COVERAGE_ONLY","Digest Role":"REQUIRED","Proof / Evidence":"4/4 fixture stability; 8 no-op recompositions each"},
+        {"Key":"composition.oversetState","Category":"composition","Snapshot Role":"COVERAGE_ONLY","Digest Role":"REQUIRED","Proof / Evidence":"4/4 fixture stability; 8 no-op recompositions each"}
+    ];
+
+    function copyRows() {
+        var out = [];
+        var i, row;
+
+        for (i = 0; i < ROWS.length; i++) {
+            row = ROWS[i];
+            out.push({
+                "Key": row["Key"],
+                "Category": row["Category"],
+                "Snapshot Role": row["Snapshot Role"],
+                "Digest Role": row["Digest Role"],
+                "Proof / Evidence": row["Proof / Evidence"]
+            });
+        }
+
+        return out;
+    }
+
+    function keys() {
+        var out = [];
+        var i;
+
+        for (i = 0; i < ROWS.length; i++) {
+            out.push(ROWS[i]["Key"]);
+        }
+
+        return out;
+    }
+
+    function paragraphProperties() {
+        var out = [];
+        var i, key;
+
+        for (i = 0; i < ROWS.length; i++) {
+            key = ROWS[i]["Key"];
+            if (ROWS[i]["Category"] === "paragraph" &&
+                key.indexOf("paragraph.") === 0 &&
+                key !== "paragraph.appliedParagraphStyle" &&
+                key !== "paragraph.overrideState") {
+                out.push(key.substring("paragraph.".length));
+            }
+        }
+
+        return out;
+    }
+
+    function characterProperties() {
+        var out = [];
+        var i, key;
+
+        for (i = 0; i < ROWS.length; i++) {
+            key = ROWS[i]["Key"];
+            if (ROWS[i]["Category"] === "character" &&
+                key.indexOf("characters.") === 0) {
+                out.push(key.substring("characters.".length));
+            }
+        }
+
+        return out;
+    }
+
+    function validate() {
+        var seen = {};
+        var i, key;
+
+        if (ROWS.length !== FROZEN_KEY_COUNT) {
+            return {ok:false, reason:"Frozen registry key count mismatch."};
+        }
+
+        for (i = 0; i < ROWS.length; i++) {
+            key = String(ROWS[i]["Key"] || "");
+            if (key.length === 0) {
+                return {ok:false, reason:"Frozen registry contains an empty key."};
+            }
+            if (seen[key]) {
+                return {ok:false, reason:"Frozen registry contains duplicate key: " + key};
+            }
+            seen[key] = true;
+        }
+
+        if (paragraphProperties().length !== 180) {
+            return {ok:false, reason:"Paragraph property count mismatch."};
+        }
+
+        if (characterProperties().length !== 53) {
+            return {ok:false, reason:"Character property count mismatch."};
+        }
+
+        return {ok:true, reason:""};
+    }
+
+    return {
+        VERSION: VERSION,
+        SOURCE_SHA256: SOURCE_SHA256,
+        FROZEN_KEY_COUNT: FROZEN_KEY_COUNT,
+        rows: copyRows,
+        keys: keys,
+        paragraphProperties: paragraphProperties,
+        characterProperties: characterProperties,
+        validate: validate
+    };
+}());
